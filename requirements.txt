@@ -1,2 +1,13 @@
 google.generativeai
 matplotlib
+ExcelWriter
+pandas
+streamlit
+plotly
+numpy
+Pillow
+openpyxl
+streamlit_sortables
+networkx
+workadays
+streamlit_extras

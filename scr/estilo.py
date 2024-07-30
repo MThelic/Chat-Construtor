@@ -60,4 +60,5 @@ def menu_lateral(pagina="Chat Construtor"):
         st.divider()
         st.subheader("MENU EM CONSTRUÇÃO")
         for pag, value in scr.constantes.PAGINAS.items():
-            st.page_link(pag, label=value[0], icon=value[1])
+            try:st.page_link(pag, label=value[0], icon=value[1])
+            except Exception as e: st.warning(e)
