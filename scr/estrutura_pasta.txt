@@ -1,21 +1,98 @@
 Estrutura da Pasta:
-projeto_auto_construtor/
-    constantes.py
-    estilo.py
+auto-construtor/
+    .gitignore
     main.py
+    README.md
+    .git/
+        COMMIT_EDITMSG
+        config
+        description
+        FETCH_HEAD
+        HEAD
+        index
+        packed-refs
+        hooks/
+            applypatch-msg.sample
+            commit-msg.sample
+            fsmonitor-watchman.sample
+            post-update.sample
+            pre-applypatch.sample
+            pre-commit.sample
+            pre-merge-commit.sample
+            pre-push.sample
+            pre-rebase.sample
+            pre-receive.sample
+            prepare-commit-msg.sample
+            push-to-checkout.sample
+            sendemail-validate.sample
+            update.sample
+        info/
+            exclude
+        logs/
+            HEAD
+            refs/
+                heads/
+                    master
+                remotes/
+                    origin/
+                        main
+                        master
+        objects/
+            00/
+                fd9059b897a1171e3a2b7566ed94c23d36cc4f
+            11/
+                cb4d763ec01e61e048c5e66dc1eb38fba1aa1d
+            24/
+                b6ddb8701a1f756de03aa3e34b4e89e63ff93d
+            31/
+                c354227bb1950b5c24ba77d85111dda970da5a
+            45/
+                fbd804d26c747650c5cf0477a8e90b3f470490
+            49/
+                8de3a6c1c838096f93efa0633fc203e77b5e9e
+            4f/
+                508126f5d05fae9b626c4b6bf6b36ed177e0e2
+            5d/
+                0d62911ff3ebd1a811e0b85063f8f2560d440c
+            97/
+                2c085adb84424e01748046f90910036cf64b66
+            a0/
+                d985ce0004195e92c5034b1df6f061d2a38817
+            ad/
+                220be9294589a6c2b56948a0b28e04cdd451b5
+            bf/
+                65f1023131dd5833ee1192aa14c42ae79665f7
+            c3/
+                b432e5f9b2bc556ac9c6df418c54f15a49a801
+            eb/
+                82a8d9c74035f44802e70d79f5443c094a6b42
+            info/
+            pack/
+                pack-ddea4ba1d93c7e33349d863fe5d6c25e7a6af5f9.idx
+                pack-ddea4ba1d93c7e33349d863fe5d6c25e7a6af5f9.pack
+                pack-ddea4ba1d93c7e33349d863fe5d6c25e7a6af5f9.rev
+        refs/
+            heads/
+                master
+            remotes/
+                origin/
+                    main
+                    master
+            tags/
     .streamlit/
         config.toml
     assets/
-        .gitkeep.txt
         logo_dark.png
+        logo_dark_2.png
         logo_icone_rgb.ico
         logo_light.png
     base/
         .gitkeep.txt
         imagens/
+            foto_1.jpg
     pages/
-        .gitkeep.txt
         estrutura.py
+        grafico_gauss.py
         sobre.py
     scr/
         constantes.py
@@ -35,87 +112,13 @@ projeto_auto_construtor/
 
 
 
-Nome do Arquivo:constantes.py
-Código:PAGINAS={'main.py': ['Site Auto Gerador', '💻'], 'pages/dobro.py': ['Valor Dobrado', '🔢']}
-
-
-
-
-Nome do Arquivo:estilo.py
-Código:import streamlit as st
-from streamlit.errors import StreamlitAPIException
-from PIL import Image
-from pathlib import Path
-import base64
-import scr.constantes
-
-def importar_assets():
-    def abrir_imagem(path):
-        return Image.open(Path(path))
-    def abrir_imagem_base64(path):
-        return base64.b64encode(Path(path).read_bytes()).decode()
-
-    assets={
-        'logo_ico': abrir_imagem('assets/logo_icone_rgb.ico'),
-        'logo_dark': abrir_imagem('assets/logo_dark.png'),
-        'logo_light': abrir_imagem('assets/logo_light.png'),
-        'logo_dark_base64':abrir_imagem_base64('assets/logo_dark.png')
-    }
-    return assets
-
-def importar_estilos():
-    with open(r"scr/estilos.css", "r") as f:
-        css = f.read()
-    return css
-
-def aplicar_estilos(*classes, texto="", imagem=None, link=None, link_pagina=None):
-    css = importar_estilos()
-    classes_str = " ".join(classes)
-    if imagem != None:
-        elemento = f"<img src=data:image/png;base64,{imagem}>"
-    else:
-        elemento = texto
-    div = f"""<div class="{classes_str}">{elemento}</div>"""
-    if link != None:
-        div = f"<a href='{link}'>{div}</a>"
-    elif link_pagina != None:
-        div = f"<a href='{link_pagina}' target='_self'>{div}</a>"
-
-    return f"""<style>{css}</style>{div}"""
-
-def menu_lateral(pagina="Site Auto Gerador"):
-    if pagina != "Site Auto Gerador" and "Bug Iniciar" not in st.session_state:
-        st.session_state["Bug Iniciar"] = True
-        st.rerun()
-    assets = importar_assets()
-    try:
-        st.set_page_config(
-            page_title="Auto Construtor", page_icon=assets["logo_ico"], layout="wide"
-        )
-    except StreamlitAPIException:
-        pass
-    with st.sidebar:
-        st.markdown(
-            aplicar_estilos(
-                "imagens", link_pagina="", imagem=assets["logo_dark_base64"]
-            ),
-            unsafe_allow_html=True,
-        )
-        st.divider()
-        st.subheader("CHAT EM CONSTRUÇÃO")
-        for pag, value in scr.constantes.PAGINAS.items():
-            st.page_link(pag, label=value[0], icon=value[1])
-
-
-
-
 Nome do Arquivo:main.py
 Código:import streamlit as st
 import scr.gemini
 import scr.estilo
 
 scr.estilo.menu_lateral()
-st.markdown('## :rainbow[CHAT CONSTRUTOR]')
+st.markdown('## CHAT CONSTRUTOR')
 
 if "messages" not in st.session_state:
     st.session_state.messages = []
@@ -148,6 +151,7 @@ def gerar_estrutura_diagrama(pasta_raiz):
     """Gera um diagrama da estrutura de pastas e arquivos."""
     estrutura = []
     for root, dirs, files in os.walk(pasta_raiz):
+        if '.git' in root or 'pycache' in root: continue
         level = root.replace(pasta_raiz, '').count(os.sep)
         indent = '  ' * level
         estrutura.append(f"{indent}{os.path.basename(root)}/")
@@ -161,6 +165,72 @@ estrutura_diagrama = gerar_estrutura_diagrama(pasta_raiz)
 
 # Exibe a estrutura
 st.markdown("```\n" + "\n".join(estrutura_diagrama) + "\n```")
+
+
+
+
+Nome do Arquivo:grafico_gauss.py
+Código:import streamlit as st
+import numpy as np
+import matplotlib.pyplot as plt
+import scr.estilo
+
+scr.estilo.menu_lateral(pagina="Gráfico Interativo")
+
+st.title("Gráfico Interativo")
+
+st.markdown("""
+    Explore diferentes tipos de funções e visualize como seus parâmetros influenciam seu comportamento.
+""")
+
+# Lista suspensa para escolher o tipo de função
+funcao_escolhida = st.selectbox("Selecione o tipo de função:",
+    ("Linear", "Quadrática", "3º Grau", "Senoide", "Circular"))
+
+# Parâmetros da função escolhida
+if funcao_escolhida == "Linear":
+    a = st.slider("Coeficiente Angular (a)", -5.0, 5.0, 0.0, step=0.1)
+    b = st.slider("Coeficiente Linear (b)", -5.0, 5.0, 0.0, step=0.1)
+    x = np.linspace(-5, 5, 100)
+    y = a * x + b
+elif funcao_escolhida == "Quadrática":
+    a = st.slider("Coeficiente Quadrático (a)", -5.0, 5.0, 1.0, step=0.1)
+    b = st.slider("Coeficiente Linear (b)", -5.0, 5.0, 0.0, step=0.1)
+    c = st.slider("Termo Constante (c)", -5.0, 5.0, 0.0, step=0.1)
+    x = np.linspace(-5, 5, 100)
+    y = a * x**2 + b * x + c
+elif funcao_escolhida == "3º Grau":
+    a = st.slider("Coeficiente Cúbico (a)", -5.0, 5.0, 1.0, step=0.1)
+    b = st.slider("Coeficiente Quadrático (b)", -5.0, 5.0, 0.0, step=0.1)
+    c = st.slider("Coeficiente Linear (c)", -5.0, 5.0, 0.0, step=0.1)
+    d = st.slider("Termo Constante (d)", -5.0, 5.0, 0.0, step=0.1)
+    x = np.linspace(-5, 5, 100)
+    y = a * x**3 + b * x**2 + c * x + d
+elif funcao_escolhida == "Senoide":
+    amplitude = st.slider("Amplitude", 0.1, 5.0, 1.0, step=0.1)
+    frequencia = st.slider("Frequência", 0.1, 5.0, 1.0, step=0.1)
+    fase = st.slider("Fase", -np.pi, np.pi, 0.0, step=0.1)
+    x = np.linspace(0, 2 * np.pi, 100)
+    y = amplitude * np.sin(frequencia * x + fase)
+elif funcao_escolhida == "Circular":
+    raio = st.slider("Raio", 0.1, 5.0, 1.0, step=0.1)
+    x = raio * np.cos(np.linspace(0, 2 * np.pi, 100))
+    y = raio * np.sin(np.linspace(0, 2 * np.pi, 100))
+
+# Plotagem do gráfico
+fig, ax = plt.subplots(figsize=(6, 4)) # Reduz o tamanho do gráfico
+ax.plot(x, y, "r-", linewidth=2)
+ax.set_xlabel("x")
+ax.set_ylabel("f(x)")
+ax.set_title(f"Gráfico de {funcao_escolhida}")
+ax.grid(True)
+
+# Exibe o gráfico
+
+st.columns([1,4,1])[1].pyplot(fig)
+
+st.markdown("### :tada[Personalize os parâmetros da função usando os sliders! 🎉]")
+
 
 
 
@@ -205,10 +275,12 @@ st.markdown("""
 
 st.markdown(f"### :rainbow[Essa página foi criada automaticamente pelo Chat Construtor! 🎉]")
 
+st.image("https://www.robotlab.com/hubfs/NAO%20V6%20-%20TOP.png",)
+
 
 
 Nome do Arquivo:constantes.py
-Código:PAGINAS={'main.py': ['Chat Construtor', '💻'], 'pages/estrutura.py': ['Estrutura do Projeto', '🗄️'], 'pages/sobre.py': ['Sobre o Chat Construtor', '🤖']}
+Código:PAGINAS={'main.py': ['Chat Construtor', '💻'], 'pages/estrutura.py': ['Estrutura do Projeto', '🗄️'], 'pages/sobre.py': ['Sobre o Chat Construtor', '🤖'], 'pages/grafico_gauss.py': ['Gráfico Interativo', '📊']}
 
 
 
@@ -349,8 +421,6 @@ Código:import os
 import shutil
 import scr.constantes
 
-menu_lateral="import scr.estilo\nscr.estilo.menu_lateral()\n"
-
 def add_pagina(configuracao):
     pag=scr.constantes.PAGINAS
     pag[configuracao[0]]=[configuracao[1],configuracao[2]]
@@ -380,7 +450,8 @@ def executar_comando(key,value):
     elif ',' in key:
         configuracao=key.split(',')
         add_pagina(configuracao)
-        conteudo=menu_lateral+value if not('scr.estilo.menu_lateral(' in value) else value
+        conteudo = value+'import scr.estilo' if 'import scr.estilo'not in value else value
+        conteudo = conteudo+'scr.estilo.menu_lateral()' if 'scr.estilo.menu_lateral('not in value else conteudo
         open(f"{configuracao[0]}", "w", encoding='utf-8').write(conteudo)
         return f'Página {configuracao[2]} {configuracao[1]}'
     else:

@@ -37,3 +37,5 @@ st.markdown("""
 """)
 
 st.markdown(f"### :rainbow[Essa página foi criada automaticamente pelo Chat Construtor! 🎉]")
+
+st.image("https://www.robotlab.com/hubfs/NAO%20V6%20-%20TOP.png",)

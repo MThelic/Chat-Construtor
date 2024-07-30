@@ -2,8 +2,6 @@ import os
 import shutil
 import scr.constantes
 
-menu_lateral="import scr.estilo\nscr.estilo.menu_lateral()\n"
-
 def add_pagina(configuracao):
     pag=scr.constantes.PAGINAS
     pag[configuracao[0]]=[configuracao[1],configuracao[2]]
@@ -33,7 +31,8 @@ def executar_comando(key,value):
     elif ',' in key:
         configuracao=key.split(',')
         add_pagina(configuracao)
-        conteudo=menu_lateral+value if not('scr.estilo.menu_lateral(' in value) else value
+        conteudo = value+'import scr.estilo' if 'import scr.estilo'not in value else value
+        conteudo = conteudo+'scr.estilo.menu_lateral()' if 'scr.estilo.menu_lateral('not in value else conteudo
         open(f"{configuracao[0]}", "w", encoding='utf-8').write(conteudo)
         return f'Página {configuracao[2]} {configuracao[1]}'
     else:

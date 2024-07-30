@@ -3,7 +3,7 @@ import scr.gemini
 import scr.estilo
 
 scr.estilo.menu_lateral()
-st.markdown('## :rainbow[CHAT CONSTRUTOR]')
+st.markdown('## CHAT CONSTRUTOR')
 
 if "messages" not in st.session_state:
     st.session_state.messages = []

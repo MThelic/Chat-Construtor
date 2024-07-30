@@ -1,0 +1,11 @@
+[theme]
+base="dark"
+primaryColor="#12a2c5"
+backgroundColor="#000000"
+secondaryBackgroundColor="#21363b"
+
+[server]
+maxMessageSize = 500
+
+[client]
+showSidebarNavigation = false

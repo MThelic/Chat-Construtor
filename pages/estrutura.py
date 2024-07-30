@@ -9,6 +9,7 @@ def gerar_estrutura_diagrama(pasta_raiz):
     """Gera um diagrama da estrutura de pastas e arquivos."""
     estrutura = []
     for root, dirs, files in os.walk(pasta_raiz):
+        if '.git' in root or 'pycache' in root: continue
         level = root.replace(pasta_raiz, '').count(os.sep)
         indent = '  ' * level
         estrutura.append(f"{indent}{os.path.basename(root)}/")
