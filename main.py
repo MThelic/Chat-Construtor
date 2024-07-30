@@ -20,4 +20,4 @@ for message in st.session_state.messages:
 
 if not user_input and not st.session_state.messages:
     sugestao = scr.gemini.call_google_gemini_api('Gere uma sugestão de prompt para o chat do Streamlit.')
-    st.chat_message("assistant").markdown("Experimente: *"+sugestao.strip('Resposta: ')+"*")
+    st.chat_message("assistant").markdown("Experimente: *"+sugestao.strip('Resposta: ').strip()+"*")
