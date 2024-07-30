@@ -1,0 +1,1 @@
+PAGINAS={'main.py': ['Chat Construtor', '💻'], 'pages/estrutura.py': ['Estrutura do Projeto', '🗄️'], 'pages/sobre.py': ['Sobre o Chat Construtor', '🤖'], 'pages/grafico_gauss.py': ['Gráfico Interativo', '📊']}

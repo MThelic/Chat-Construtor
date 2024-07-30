@@ -1,0 +1,469 @@
+Estrutura da Pasta:
+auto-construtor/
+    .gitignore
+    main.py
+    README.md
+    .git/
+        COMMIT_EDITMSG
+        config
+        description
+        FETCH_HEAD
+        HEAD
+        index
+        packed-refs
+        hooks/
+            applypatch-msg.sample
+            commit-msg.sample
+            fsmonitor-watchman.sample
+            post-update.sample
+            pre-applypatch.sample
+            pre-commit.sample
+            pre-merge-commit.sample
+            pre-push.sample
+            pre-rebase.sample
+            pre-receive.sample
+            prepare-commit-msg.sample
+            push-to-checkout.sample
+            sendemail-validate.sample
+            update.sample
+        info/
+            exclude
+        logs/
+            HEAD
+            refs/
+                heads/
+                    master
+                remotes/
+                    origin/
+                        main
+                        master
+        objects/
+            00/
+                fd9059b897a1171e3a2b7566ed94c23d36cc4f
+            11/
+                cb4d763ec01e61e048c5e66dc1eb38fba1aa1d
+            24/
+                b6ddb8701a1f756de03aa3e34b4e89e63ff93d
+            31/
+                c354227bb1950b5c24ba77d85111dda970da5a
+            45/
+                fbd804d26c747650c5cf0477a8e90b3f470490
+            49/
+                8de3a6c1c838096f93efa0633fc203e77b5e9e
+            4f/
+                508126f5d05fae9b626c4b6bf6b36ed177e0e2
+            5d/
+                0d62911ff3ebd1a811e0b85063f8f2560d440c
+            97/
+                2c085adb84424e01748046f90910036cf64b66
+            a0/
+                d985ce0004195e92c5034b1df6f061d2a38817
+            ad/
+                220be9294589a6c2b56948a0b28e04cdd451b5
+            bf/
+                65f1023131dd5833ee1192aa14c42ae79665f7
+            c3/
+                b432e5f9b2bc556ac9c6df418c54f15a49a801
+            eb/
+                82a8d9c74035f44802e70d79f5443c094a6b42
+            info/
+            pack/
+                pack-ddea4ba1d93c7e33349d863fe5d6c25e7a6af5f9.idx
+                pack-ddea4ba1d93c7e33349d863fe5d6c25e7a6af5f9.pack
+                pack-ddea4ba1d93c7e33349d863fe5d6c25e7a6af5f9.rev
+        refs/
+            heads/
+                master
+            remotes/
+                origin/
+                    main
+                    master
+            tags/
+    .streamlit/
+        config.toml
+    assets/
+        logo_dark.png
+        logo_dark_2.png
+        logo_icone_rgb.ico
+        logo_light.png
+    base/
+        .gitkeep.txt
+        imagens/
+            foto_1.jpg
+    pages/
+        estrutura.py
+        grafico_gauss.py
+        sobre.py
+    scr/
+        constantes.py
+        estilo.py
+        estilos.css
+        estrutura_pasta.txt
+        gemini.py
+        instrucoes_gemini.txt
+        ler_pastas.py
+        modificar_arquivos.py
+        __pycache__/
+            constantes.cpython-312.pyc
+            estilo.cpython-312.pyc
+            gemini.cpython-312.pyc
+            ler_pastas.cpython-312.pyc
+            modificar_arquivos.cpython-312.pyc
+
+
+
+Nome do Arquivo:main.py
+Código:import streamlit as st
+import scr.gemini
+import scr.estilo
+
+scr.estilo.menu_lateral()
+st.markdown('## CHAT CONSTRUTOR')
+
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+
+user_input = st.chat_input("Digite seu texto:")
+
+if user_input:
+    st.session_state.messages.append({"role": "user", "content": user_input})
+    response = scr.gemini.call_google_gemini_api('LEMBRE-SE DE TODAS AS INSTRUÇÕES!! '+user_input)
+    st.session_state.messages.append({"role": "assistant", "content": response})
+
+for message in st.session_state.messages:
+    st.chat_message(message["role"]).markdown(message["content"])
+
+if not user_input and not st.session_state.messages:
+    st.chat_message("assistant").markdown("Insira alguma instrução ou pergunte por sugestões")
+
+
+
+
+Nome do Arquivo:estrutura.py
+Código:import streamlit as st
+import scr.estilo
+import os
+
+scr.estilo.menu_lateral(pagina="Estrutura do Projeto")
+st.title("Estrutura do Projeto")
+
+def gerar_estrutura_diagrama(pasta_raiz):
+    """Gera um diagrama da estrutura de pastas e arquivos."""
+    estrutura = []
+    for root, dirs, files in os.walk(pasta_raiz):
+        if '.git' in root or 'pycache' in root: continue
+        level = root.replace(pasta_raiz, '').count(os.sep)
+        indent = '  ' * level
+        estrutura.append(f"{indent}{os.path.basename(root)}/")
+        for file in files:
+            estrutura.append(f"{indent}  - {file}")
+    return estrutura
+
+# Obtém a estrutura do projeto
+pasta_raiz = os.getcwd()
+estrutura_diagrama = gerar_estrutura_diagrama(pasta_raiz)
+
+# Exibe a estrutura
+st.markdown("```\n" + "\n".join(estrutura_diagrama) + "\n```")
+
+
+
+
+Nome do Arquivo:grafico_gauss.py
+Código:import streamlit as st
+import numpy as np
+import matplotlib.pyplot as plt
+import scr.estilo
+
+scr.estilo.menu_lateral(pagina="Gráfico Interativo")
+
+st.title("Gráfico Interativo")
+
+st.markdown("""
+    Explore diferentes tipos de funções e visualize como seus parâmetros influenciam seu comportamento.
+""")
+
+# Lista suspensa para escolher o tipo de função
+funcao_escolhida = st.selectbox("Selecione o tipo de função:",
+    ("Linear", "Quadrática", "3º Grau", "Senoide", "Circular"))
+
+# Parâmetros da função escolhida
+if funcao_escolhida == "Linear":
+    a = st.slider("Coeficiente Angular (a)", -5.0, 5.0, 0.0, step=0.1)
+    b = st.slider("Coeficiente Linear (b)", -5.0, 5.0, 0.0, step=0.1)
+    x = np.linspace(-5, 5, 100)
+    y = a * x + b
+elif funcao_escolhida == "Quadrática":
+    a = st.slider("Coeficiente Quadrático (a)", -5.0, 5.0, 1.0, step=0.1)
+    b = st.slider("Coeficiente Linear (b)", -5.0, 5.0, 0.0, step=0.1)
+    c = st.slider("Termo Constante (c)", -5.0, 5.0, 0.0, step=0.1)
+    x = np.linspace(-5, 5, 100)
+    y = a * x**2 + b * x + c
+elif funcao_escolhida == "3º Grau":
+    a = st.slider("Coeficiente Cúbico (a)", -5.0, 5.0, 1.0, step=0.1)
+    b = st.slider("Coeficiente Quadrático (b)", -5.0, 5.0, 0.0, step=0.1)
+    c = st.slider("Coeficiente Linear (c)", -5.0, 5.0, 0.0, step=0.1)
+    d = st.slider("Termo Constante (d)", -5.0, 5.0, 0.0, step=0.1)
+    x = np.linspace(-5, 5, 100)
+    y = a * x**3 + b * x**2 + c * x + d
+elif funcao_escolhida == "Senoide":
+    amplitude = st.slider("Amplitude", 0.1, 5.0, 1.0, step=0.1)
+    frequencia = st.slider("Frequência", 0.1, 5.0, 1.0, step=0.1)
+    fase = st.slider("Fase", -np.pi, np.pi, 0.0, step=0.1)
+    x = np.linspace(0, 2 * np.pi, 100)
+    y = amplitude * np.sin(frequencia * x + fase)
+elif funcao_escolhida == "Circular":
+    raio = st.slider("Raio", 0.1, 5.0, 1.0, step=0.1)
+    x = raio * np.cos(np.linspace(0, 2 * np.pi, 100))
+    y = raio * np.sin(np.linspace(0, 2 * np.pi, 100))
+
+# Plotagem do gráfico
+fig, ax = plt.subplots(figsize=(6, 4)) # Reduz o tamanho do gráfico
+ax.plot(x, y, "r-", linewidth=2)
+ax.set_xlabel("x")
+ax.set_ylabel("f(x)")
+ax.set_title(f"Gráfico de {funcao_escolhida}")
+ax.grid(True)
+
+# Exibe o gráfico
+
+st.columns([1,4,1])[1].pyplot(fig)
+
+st.markdown("### :tada[Personalize os parâmetros da função usando os sliders! 🎉]")
+
+
+
+
+Nome do Arquivo:sobre.py
+Código:import streamlit as st
+import scr.estilo
+
+scr.estilo.menu_lateral(pagina="Sobre o Chat Construtor")
+
+st.title("Sobre o Chat Construtor")
+
+st.markdown("""
+    O Chat Construtor é uma ferramenta poderosa para desenvolvedores de aplicações Streamlit. 
+    Ele permite que você crie, modifique e gerencie seu projeto de forma rápida e eficiente, 
+    usando a inteligência artificial para gerar código automaticamente.
+
+    ## Como funciona?
+
+    O Chat Construtor usa o modelo de linguagem **Gemini** para entender suas instruções e gerar o código Streamlit desejado. 
+    Basta digitar seus requisitos e o Chat Construtor fará o resto! 
+
+    ## Recursos:
+
+    * **Geração de Código Automática:** Crie páginas, componentes e funcionalidades com facilidade.
+    * **Integração com o Gemini:** Acesse a inteligência artificial avançada do Gemini para obter resultados precisos.
+    * **Gerenciamento de Arquivos:** Organize seu projeto com a função de gerenciamento de arquivos.
+
+    ## Começando:
+
+    1. **Digite suas instruções:** Explique o que você deseja que o Chat Construtor faça.
+    2. **Revise o código gerado:** Verifique se o código atende às suas necessidades.
+    3. **Execute o código:** Execute o código gerado em seu ambiente Streamlit.
+
+    ## Observações:
+
+    * O Chat Construtor ainda está em desenvolvimento. 
+    * Se você encontrar algum erro, por favor, relate-o para que possamos melhorá-lo.
+    * O Chat Construtor é uma ferramenta poderosa, mas não substitui o conhecimento de programação.
+
+    ## Explore e experimente!
+""")
+
+st.markdown(f"### :rainbow[Essa página foi criada automaticamente pelo Chat Construtor! 🎉]")
+
+st.image("https://www.robotlab.com/hubfs/NAO%20V6%20-%20TOP.png",)
+
+
+
+Nome do Arquivo:constantes.py
+Código:PAGINAS={'main.py': ['Chat Construtor', '💻'], 'pages/estrutura.py': ['Estrutura do Projeto', '🗄️'], 'pages/sobre.py': ['Sobre o Chat Construtor', '🤖'], 'pages/grafico_gauss.py': ['Gráfico Interativo', '📊']}
+
+
+
+Nome do Arquivo:estilo.py
+Código:import streamlit as st
+from streamlit.errors import StreamlitAPIException
+from PIL import Image
+from pathlib import Path
+import base64
+import scr.constantes
+
+def importar_assets():
+    def abrir_imagem(path):
+        return Image.open(Path(path))
+    def abrir_imagem_base64(path):
+        return base64.b64encode(Path(path).read_bytes()).decode()
+
+    assets={
+        'logo_ico': abrir_imagem('assets/logo_icone_rgb.ico'),
+        'logo_dark': abrir_imagem('assets/logo_dark.png'),
+        'logo_light': abrir_imagem('assets/logo_light.png'),
+        'logo_dark_base64':abrir_imagem_base64('assets/logo_dark.png')
+    }
+    return assets
+
+def importar_estilos():
+    with open(r"scr/estilos.css", "r") as f:
+        css = f.read()
+    return css
+
+def aplicar_estilos(*classes, texto="", imagem=None, link=None, link_pagina=None):
+    css = importar_estilos()
+    classes_str = " ".join(classes)
+    if imagem != None:
+        elemento = f"<img src=data:image/png;base64,{imagem}>"
+    else:
+        elemento = texto
+    div = f"""<div class="{classes_str}">{elemento}</div>"""
+    if link != None:
+        div = f"<a href='{link}'>{div}</a>"
+    elif link_pagina != None:
+        div = f"<a href='{link_pagina}' target='_self'>{div}</a>"
+
+    return f"""<style>{css}</style>{div}"""
+
+def menu_lateral(pagina="Chat Construtor"):
+    if pagina != "Chat Construtor" and "Bug Iniciar" not in st.session_state:
+        st.session_state["Bug Iniciar"] = True
+        st.rerun()
+    assets = importar_assets()
+    try:
+        st.set_page_config(
+            page_title="Chat Construtor", page_icon=assets["logo_ico"], layout="wide"
+        )
+    except StreamlitAPIException:
+        pass
+    with st.sidebar:
+        st.markdown(
+            aplicar_estilos(
+                "imagens", link_pagina="", imagem=assets["logo_dark_base64"]
+            ),
+            unsafe_allow_html=True,
+        )
+        st.divider()
+        st.subheader("MENU EM CONSTRUÇÃO")
+        for pag, value in scr.constantes.PAGINAS.items():
+            st.page_link(pag, label=value[0], icon=value[1])
+
+
+
+Nome do Arquivo:gemini.py
+Código:import google.generativeai as genai
+import scr.ler_pastas
+import scr.modificar_arquivos
+import os
+from google.generativeai.types import HarmCategory, HarmBlockThreshold
+
+genai.configure(api_key="AIzaSyAgG2qM9rDLz00ec5lpysZgVRCz7iZOkLU")
+
+generation_config = { "temperature": 1, "top_p": 0.95, "top_k": 64, "max_output_tokens": 8192, "response_mime_type": "text/plain"}
+
+model = genai.GenerativeModel( model_name="gemini-1.5-flash", generation_config=generation_config,safety_settings={HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_ONLY_HIGH})
+
+instrucoes = open(r'scr/instrucoes_gemini.txt', 'r', encoding='utf-8').read()
+codigo_atual=scr.ler_pastas.read_folder_structure_and_files()
+
+chat_session = model.start_chat( history=[ { "role": "user", "parts": [instrucoes + codigo_atual]}])
+
+def call_google_gemini_api(text):
+    response = chat_session.send_message(text)
+    response_text = response.text
+    
+    return scr.modificar_arquivos.ler_resposta(response_text)
+
+
+
+Nome do Arquivo:ler_pastas.py
+Código:import os
+
+def read_folder_structure_and_files():
+    folder_path = os.getcwd()
+    print(folder_path)
+    folder_structure = []
+    python_files = []
+
+    # Coletando a estrutura das pastas e arquivos Python
+    for root, dirs, files in os.walk(folder_path):
+        level = root.replace(folder_path, '').count(os.sep)
+        indent = ' ' * 4 * level
+        folder_structure.append(f"{indent}{os.path.basename(root)}/")
+        subindent = ' ' * 4 * (level + 1)
+        for file in files:
+            folder_structure.append(f"{subindent}{file}")
+            if file.endswith('.py'):
+                file_path = os.path.join(root, file)
+                python_files.append(file_path)
+
+    # Construindo o conteúdo a ser retornado
+    output_content = "Estrutura da Pasta:\n"
+    output_content += "\n".join(folder_structure)
+    output_content += "\n\n"
+
+    for file_path in python_files:
+        with open(file_path, 'r', encoding='utf-8') as py_file:
+            file_content = py_file.read()
+            output_content += "\n\n"
+            output_content += f"Nome do Arquivo:{os.path.basename(file_path)}\n"
+            output_content += f"Código:{file_content}\n\n"
+    open(r'scr/estrutura_pasta.txt', 'w', encoding='utf-8').write(output_content)
+
+    return output_content
+
+
+
+
+Nome do Arquivo:modificar_arquivos.py
+Código:import os
+import shutil
+import scr.constantes
+
+def add_pagina(configuracao):
+    pag=scr.constantes.PAGINAS
+    pag[configuracao[0]]=[configuracao[1],configuracao[2]]
+    open(r"scr/constantes.py", "w", encoding='utf-8').write("PAGINAS="+str(pag))
+
+def remover_pagina(value):
+    pag=scr.constantes.PAGINAS
+    pag.pop(value)
+    open(r"scr/constantes.py", "w", encoding='utf-8').write("PAGINAS="+str(pag))
+
+def executar_comando(key,value):
+    if key=='chat':
+        return f'Resposta: {value}'
+    elif key=='criar':
+        value=value.strip()
+        os.makedirs(value, exist_ok=True)
+        return f'Pasta {value} criada'
+    elif key=='deletar':
+        value=value.strip()
+        caminho=os.path.abspath(value)
+        if os.path.isfile(caminho):
+            os.remove(caminho)
+            if 'pages' in value: remover_pagina(value)
+        elif os.path.isdir(caminho): shutil.rmtree(caminho)
+        else: return f'O caminho {value} não existe.'
+        return f'Pasta {value} excluída'
+    elif ',' in key:
+        configuracao=key.split(',')
+        add_pagina(configuracao)
+        conteudo = value+'import scr.estilo' if 'import scr.estilo'not in value else value
+        conteudo = conteudo+'scr.estilo.menu_lateral()' if 'scr.estilo.menu_lateral('not in value else conteudo
+        open(f"{configuracao[0]}", "w", encoding='utf-8').write(conteudo)
+        return f'Página {configuracao[2]} {configuracao[1]}'
+    else:
+        open(f"{key}", "w", encoding='utf-8').write(value)
+        return f'Arquivo {key} criado'
+
+def ler_resposta(response_text):
+    mensagens=[]
+    lista=response_text.split('$')
+    dicionario = {item: lista[i + 1].strip('|') for i, item in enumerate(lista) if item and item[0] != '|'}
+    for key in dicionario:
+        mensagens.append(executar_comando(key,dicionario[key]))
+    return "\n".join(mensagens)
+
+
