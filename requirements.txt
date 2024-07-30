@@ -1,6 +1,5 @@
 google.generativeai
 matplotlib
-ExcelWriter
 pandas
 streamlit
 plotly
