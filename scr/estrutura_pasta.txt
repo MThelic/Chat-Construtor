@@ -3,6 +3,7 @@ auto-construtor/
     .gitignore
     main.py
     README.md
+    requirements.txt
     .git/
         COMMIT_EDITMSG
         config
@@ -10,6 +11,7 @@ auto-construtor/
         FETCH_HEAD
         HEAD
         index
+        ORIG_HEAD
         packed-refs
         hooks/
             applypatch-msg.sample
@@ -42,30 +44,83 @@ auto-construtor/
                 fd9059b897a1171e3a2b7566ed94c23d36cc4f
             11/
                 cb4d763ec01e61e048c5e66dc1eb38fba1aa1d
+            15/
+                22136cb498b81a93e388ecf5f4728dfb8107a2
+            23/
+                4eb9cb143921eda8ad5e9cd394a008a794284f
             24/
                 b6ddb8701a1f756de03aa3e34b4e89e63ff93d
             31/
                 c354227bb1950b5c24ba77d85111dda970da5a
             45/
                 fbd804d26c747650c5cf0477a8e90b3f470490
+            47/
+                ffd1c6bffaacbbff301a5858a39110fb807fa3
             49/
                 8de3a6c1c838096f93efa0633fc203e77b5e9e
+            4c/
+                fd1acdde6eb9dbd2ef856bf21ef9b68cfe582f
             4f/
                 508126f5d05fae9b626c4b6bf6b36ed177e0e2
+            53/
+                55513387c20a6190159aecea45d5d71752850b
+            55/
+                18882ec2214c4df1dc8992b84f29e4142be9b9
+            57/
+                8c92ecd10887ff679584a7f417eb008552e4a4
             5d/
                 0d62911ff3ebd1a811e0b85063f8f2560d440c
+            63/
+                c8f9c004c24f55f42533d175f0123cef361ed4
+            72/
+                391c3aa23ffb02975ac1e28a8b9dfeb3c97121
+            79/
+                7db0350818b6705298019dd8ab3728d5e0bd76
+            7a/
+                d20b8d6f2f83d1237167d585a32e692ceb63c8
+            7f/
+                423f49658e0e3487959a353039f2c1be9d77ed
+            8c/
+                9e961935f608127cf5fbc0ee5ea46deda844af
             97/
                 2c085adb84424e01748046f90910036cf64b66
+            99/
+                c16789cf055ea143440f858e512a3c0ed9dc1f
+                c2a02fb1334b5c53edfa0d363d28950c5ed201
+                df2700d6575212f305ccace96f73eb4ed626d5
             a0/
                 d985ce0004195e92c5034b1df6f061d2a38817
+            a8/
+                5ac41f6133dd8bcaac609eb26c63b3405e3083
             ad/
+                1aa58923978d3c39aa02b16169cddf984b55bd
                 220be9294589a6c2b56948a0b28e04cdd451b5
+            af/
+                8cbc50265ce11e2627441c5b0efcfba03bd15c
+            b8/
+                581c863ef2c294123653af13c5cf122fe139eb
+            bb/
+                77b8976ff502b75f63005c3c12cd1cf0f4d4a9
             bf/
                 65f1023131dd5833ee1192aa14c42ae79665f7
             c3/
                 b432e5f9b2bc556ac9c6df418c54f15a49a801
+            c6/
+                77cb9902dfd93844da8c755c41e62e3522559d
+            ce/
+                a8b9c53202bf178a5b0cd369f1a29af459c9d3
+            db/
+                f5583f300a03d745e2c47454fe8013e3f7d013
+            e1/
+                6e4c0d0d6e369014ee4b9ae562ec140fd7bd40
+            e6/
+                63eb2d0a056f1cd0f4025cb0b3b396f7f139a2
+                9de29bb2d1d6434b8b29ae775ad8c2e48c5391
             eb/
                 82a8d9c74035f44802e70d79f5443c094a6b42
+                ea88cc4a60680593ab3512f863bb159db6a76d
+            ee/
+                f5bde97345ef2a4c27eda0c6790ba91079c5ec
             info/
             pack/
                 pack-ddea4ba1d93c7e33349d863fe5d6c25e7a6af5f9.idx
@@ -88,11 +143,16 @@ auto-construtor/
         logo_light.png
     base/
         .gitkeep.txt
+        estoque.csv
+        itens.json
+        vendas.csv
         imagens/
-            foto_1.jpg
     pages/
+        em_casa.py
         estrutura.py
         grafico_gauss.py
+        listar_codigos.py
+        relatorio_em_casa.py
         sobre.py
     scr/
         constantes.py
@@ -135,6 +195,100 @@ for message in st.session_state.messages:
 
 if not user_input and not st.session_state.messages:
     st.chat_message("assistant").markdown("Insira alguma instrução ou pergunte por sugestões")
+
+
+
+
+Nome do Arquivo:em_casa.py
+Código:import streamlit as st
+import scr.estilo
+import json
+import os
+import pandas as pd
+import random
+import string
+
+def gerar_chave_aleatoria(tamanho=10):
+    return ''.join(random.choices(string.ascii_letters + string.digits, k=tamanho))
+
+scr.estilo.menu_lateral()
+
+st.title("Em Casa")
+
+opcao = st.radio("Selecione uma opção:", ("Vendas", "Estoque"), horizontal=True)
+
+if opcao == "Vendas":
+    st.markdown("## Cadastro de Vendas")
+
+    # Gera uma chave aleatória
+    chave_aleatoria = gerar_chave_aleatoria()
+
+    # Exibe a chave aleatória
+    st.text(f"ID da Venda: {chave_aleatoria}")
+
+    # Lista de itens
+    itens = [
+        "Berinjela",
+        "Mini Pizza",
+        "Torta",
+        "Esfiha",
+        "Pastas Árabes"
+    ]
+
+    # Cria a lista suspensa com os itens
+    produto = st.selectbox("Produto", itens)
+
+    quantidade = st.number_input("Quantidade", min_value=1, step=1)
+    valor_unitario = st.number_input("Valor Unitário", min_value=0.01, step=0.01)
+    data_venda = st.date_input("Data da Venda")
+
+    # Botão para salvar venda
+    if st.button("Salvar Venda"):
+        st.success("Venda salva com sucesso!")
+
+        # Cria o DataFrame com os dados da venda
+        data = {'id': [chave_aleatoria], 'produto': [produto], 'quantidade': [quantidade], 'valor_unitario': [valor_unitario], 'data_venda': [data_venda.strftime('%Y-%m-%d')]}
+        df = pd.DataFrame(data)
+
+        # Salva o DataFrame em um arquivo CSV
+        df.to_csv('base/vendas.csv', mode='a', index=False, header=True)
+
+elif opcao == "Estoque":
+    st.markdown("## Cadastro de Estoque")
+
+    # Gera uma chave aleatória para o ID do estoque
+    chave_estoque = gerar_chave_aleatoria()
+
+    # Exibe a chave aleatória
+    st.text(f"ID do Estoque: {chave_estoque}")
+
+    # Lista de itens
+    itens = [
+        "Berinjela",
+        "Mini Pizza",
+        "Torta",
+        "Esfiha",
+        "Pastas Árabes"
+    ]
+
+    # Cria a lista suspensa com os itens
+    produto_estoque = st.selectbox("Produto", itens)
+
+    quantidade_estoque = st.number_input("Quantidade", min_value=0, step=1)
+    data_entrada = st.date_input("Data de Entrada")
+
+    # Botão para salvar estoque
+    if st.button("Salvar Estoque"):
+        st.success("Estoque salvo com sucesso!")
+
+        # Cria o DataFrame com os dados do estoque
+        data = {'id': [chave_estoque], 'produto': [produto_estoque], 'quantidade': [quantidade_estoque], 'data_entrada': [data_entrada.strftime('%Y-%m-%d')]}
+        df = pd.DataFrame(data)
+
+        # Salva o DataFrame em um arquivo CSV
+        df.to_csv('base/estoque.csv', mode='a', index=False, header=True)
+
+#FIM DO CÓDIGO
 
 
 
@@ -234,6 +388,71 @@ st.markdown("### :tada[Personalize os parâmetros da função usando os sliders!
 
 
 
+Nome do Arquivo:listar_codigos.py
+Código:import streamlit as st
+import os
+import scr.estilo
+scr.estilo.menu_lateral()
+
+st.title("Lista de Códigos")
+st.markdown("## Selecione um arquivo .py para visualizar seu conteúdo:")
+
+arquivos = {}
+for root, _, files in os.walk('.'):
+    for file in files:
+        if file.endswith('.py'):
+            arquivos[file] = os.path.join(root, file)
+
+arquivo_selecionado = st.selectbox("Selecione um arquivo:", list(arquivos.keys()))
+
+if arquivo_selecionado:
+    with open(arquivos[arquivo_selecionado], "r", encoding='utf-8') as f:
+        codigo = f.read()
+    st.code(codigo, language="python")
+
+
+
+Nome do Arquivo:relatorio_em_casa.py
+Código:import streamlit as st
+import scr.estilo
+import pandas as pd
+import scr.gemini
+import matplotlib.pyplot as plt
+
+scr.estilo.menu_lateral()
+
+st.title("Relatório em Casa")
+
+# Lê os arquivos CSV
+try:
+    df_vendas = pd.read_csv("base/vendas.csv")
+except FileNotFoundError:
+    df_vendas = pd.DataFrame(columns=['id', 'produto', 'quantidade', 'valor_unitario', 'data_venda'])
+try:
+    df_estoque = pd.read_csv("base/estoque.csv")
+except FileNotFoundError:
+    df_estoque = pd.DataFrame(columns=['id', 'produto', 'quantidade', 'data_entrada'])
+
+with st.expander("Banco de Dados"):
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.markdown("## Vendas")
+        st.dataframe(df_vendas)
+
+    with col2:
+        st.markdown("## Estoque")
+        st.dataframe(df_estoque)
+
+user_input = st.chat_input("Digite seu texto:")
+
+if user_input:
+    response = scr.gemini.call_google_gemini_api('LEMBRE-SE DE TODAS AS INSTRUÇÕES!! Faça modificações apenas para a página relatorio_em_casa.py'+user_input)
+    st.chat_message("assistant").markdown(response)
+
+
+
+
 Nome do Arquivo:sobre.py
 Código:import streamlit as st
 import scr.estilo
@@ -280,7 +499,7 @@ st.image("https://www.robotlab.com/hubfs/NAO%20V6%20-%20TOP.png",)
 
 
 Nome do Arquivo:constantes.py
-Código:PAGINAS={'main.py': ['Chat Construtor', '💻'], 'pages/estrutura.py': ['Estrutura do Projeto', '🗄️'], 'pages/sobre.py': ['Sobre o Chat Construtor', '🤖'], 'pages/grafico_gauss.py': ['Gráfico Interativo', '📊']}
+Código:PAGINAS={'main.py': ['Chat Construtor', '💻'], 'pages/sobre.py': ['Sobre o Chat Construtor', '🤖'], 'pages/estrutura.py': ['Estrutura do Projeto', '🗄️'], 'pages/listar_codigos.py': ['Lista de Códigos', '📃'], 'pages/grafico_gauss.py': ['Gráfico Interativo', '📊'], 'pages/em_casa.py': ['Em Casa', '🏠'], 'pages/relatorio_em_casa.py': ['Relatório em Casa', '📊']}
 
 
 
@@ -347,7 +566,8 @@ def menu_lateral(pagina="Chat Construtor"):
         st.divider()
         st.subheader("MENU EM CONSTRUÇÃO")
         for pag, value in scr.constantes.PAGINAS.items():
-            st.page_link(pag, label=value[0], icon=value[1])
+            try:st.page_link(pag, label=value[0], icon=value[1])
+            except Exception as e: st.warning(e)
 
 
 
