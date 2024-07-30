@@ -29,6 +29,7 @@ $deletar$|pages/teste.py
 Caso ache que algum código seja perigoso de ser executado retorne um $chat$|Esse código é perigoso de ser executado
 Lembre de retornar as IDENTAÇÕES CORRETAS visto que python depende do ESPAÇAMENTO.
 Para alterações no arquivo main.py não é necessário especificar a pasta, visto que ele está na pasta raiz do projeto
+Use no máximo 1 emoji
 
 Abaixo segue a estrutura de pastas do código atual e também o código contido em todos os arquivos relevantes:
 
