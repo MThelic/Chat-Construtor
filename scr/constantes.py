@@ -1,1 +1,0 @@
-PAGINAS={'main.py': ['Chat Construtor', '💻'], 'pages/sobre.py': ['Sobre o Chat Construtor', '🤖'], 'pages/estrutura.py': ['Estrutura do Projeto', '🗄️'], 'pages/listar_codigos.py': ['Lista de Códigos', '📃'], 'pages/grafico_gauss.py': ['Gráfico Interativo', '📊'], 'pages/em_casa.py': ['Em Casa', '🏠'], 'pages/relatorio_em_casa.py': ['Relatório em Casa', '📊']}

@@ -3,7 +3,7 @@ from streamlit.errors import StreamlitAPIException
 from PIL import Image
 from pathlib import Path
 import base64
-import scr.constantes
+import src.constantes
 
 def importar_assets():
     def abrir_imagem(path):
@@ -20,7 +20,7 @@ def importar_assets():
     return assets
 
 def importar_estilos():
-    with open(r"scr/estilos.css", "r") as f:
+    with open(r"src/estilos.css", "r") as f:
         css = f.read()
     return css
 
@@ -59,6 +59,6 @@ def menu_lateral(pagina="Chat Construtor"):
         )
         st.divider()
         st.subheader("MENU EM CONSTRUÇÃO")
-        for pag, value in scr.constantes.PAGINAS.items():
+        for pag, value in src.constantes.PAGINAS.items():
             try:st.page_link(pag, label=value[0], icon=value[1])
             except Exception as e: st.warning(e)

@@ -1,8 +1,8 @@
 import streamlit as st
-import scr.estilo
 import os
+from src.estilo import menu_lateral
+menu_lateral()
 
-scr.estilo.menu_lateral(pagina="Estrutura do Projeto")
 st.title("Estrutura do Projeto")
 
 def gerar_estrutura_diagrama(pasta_raiz):

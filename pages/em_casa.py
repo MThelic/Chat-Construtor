@@ -1,15 +1,14 @@
 import streamlit as st
-import scr.estilo
 import json
 import os
 import pandas as pd
 import random
 import string
+from src.estilo import menu_lateral
+menu_lateral()
 
 def gerar_chave_aleatoria(tamanho=10):
     return ''.join(random.choices(string.ascii_letters + string.digits, k=tamanho))
-
-scr.estilo.menu_lateral()
 
 st.title("Em Casa")
 
@@ -85,5 +84,3 @@ elif opcao == "Estoque":
 
         # Salva o DataFrame em um arquivo CSV
         df.to_csv('base/estoque.csv', mode='a', index=False, header=True)
-
-#FIM DO CÓDIGO

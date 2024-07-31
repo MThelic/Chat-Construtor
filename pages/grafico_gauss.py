@@ -1,60 +1,89 @@
 import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
-import scr.estilo
+from matplotlib import colormaps  # Importa o módulo colormaps
+from src.estilo import menu_lateral
 
-scr.estilo.menu_lateral(pagina="Gráfico Interativo")
+menu_lateral()
 
-st.title("Gráfico Interativo")
+st.title("Explorador de Gráficos Interativos")
 
-st.markdown("""
-    Explore diferentes tipos de funções e visualize como seus parâmetros influenciam seu comportamento.
-""")
+st.markdown(
+    """
+    Explore diferentes tipos de gráficos e visualize como seus parâmetros influenciam seu 
+    comportamento. Descubra padrões, tendências e relações nos dados de forma interativa!
+    """
+)
 
-# Lista suspensa para escolher o tipo de função
-funcao_escolhida = st.selectbox("Selecione o tipo de função:",
-    ("Linear", "Quadrática", "3º Grau", "Senoide", "Circular"))
+# Lista suspensa para escolher o tipo de gráfico
+grafico_escolhido = st.selectbox(
+    "Selecione o tipo de gráfico:",
+    ("Funções Matemáticas", "Distribuição Normal", "Gráfico de Barras", "Dispersão 3D"),
+)
 
-# Parâmetros da função escolhida
-if funcao_escolhida == "Linear":
-    a = st.slider("Coeficiente Angular (a)", -5.0, 5.0, 0.0, step=0.1)
-    b = st.slider("Coeficiente Linear (b)", -5.0, 5.0, 0.0, step=0.1)
-    x = np.linspace(-5, 5, 100)
-    y = a * x + b
-elif funcao_escolhida == "Quadrática":
-    a = st.slider("Coeficiente Quadrático (a)", -5.0, 5.0, 1.0, step=0.1)
-    b = st.slider("Coeficiente Linear (b)", -5.0, 5.0, 0.0, step=0.1)
-    c = st.slider("Termo Constante (c)", -5.0, 5.0, 0.0, step=0.1)
-    x = np.linspace(-5, 5, 100)
-    y = a * x**2 + b * x + c
-elif funcao_escolhida == "3º Grau":
-    a = st.slider("Coeficiente Cúbico (a)", -5.0, 5.0, 1.0, step=0.1)
-    b = st.slider("Coeficiente Quadrático (b)", -5.0, 5.0, 0.0, step=0.1)
-    c = st.slider("Coeficiente Linear (c)", -5.0, 5.0, 0.0, step=0.1)
-    d = st.slider("Termo Constante (d)", -5.0, 5.0, 0.0, step=0.1)
-    x = np.linspace(-5, 5, 100)
-    y = a * x**3 + b * x**2 + c * x + d
-elif funcao_escolhida == "Senoide":
-    amplitude = st.slider("Amplitude", 0.1, 5.0, 1.0, step=0.1)
-    frequencia = st.slider("Frequência", 0.1, 5.0, 1.0, step=0.1)
-    fase = st.slider("Fase", -np.pi, np.pi, 0.0, step=0.1)
-    x = np.linspace(0, 2 * np.pi, 100)
-    y = amplitude * np.sin(frequencia * x + fase)
-elif funcao_escolhida == "Circular":
-    raio = st.slider("Raio", 0.1, 5.0, 1.0, step=0.1)
-    x = raio * np.cos(np.linspace(0, 2 * np.pi, 100))
-    y = raio * np.sin(np.linspace(0, 2 * np.pi, 100))
+# Parâmetros e plotagem do gráfico escolhido
+if grafico_escolhido == "Funções Matemáticas":
+    funcao = st.selectbox("Escolha a função:", ("seno", "cosseno", "tangente", "exponencial"))
+    x = np.linspace(-2 * np.pi, 2 * np.pi, 400)
 
-# Plotagem do gráfico
-fig, ax = plt.subplots(figsize=(6, 4)) # Reduz o tamanho do gráfico
-ax.plot(x, y, "r-", linewidth=2)
-ax.set_xlabel("x")
-ax.set_ylabel("f(x)")
-ax.set_title(f"Gráfico de {funcao_escolhida}")
-ax.grid(True)
+    if funcao == "seno":
+        y = np.sin(x)
+    elif funcao == "cosseno":
+        y = np.cos(x)
+    elif funcao == "tangente":
+        y = np.tan(x)
+    else:  # exponencial
+        y = np.exp(x)
+
+    fig, ax = plt.subplots(figsize=(10, 5))
+    ax.plot(x, y, color="blue", linewidth=2)
+    ax.set_xlabel("x", fontsize=12)
+    ax.set_ylabel("f(x)", fontsize=12)
+    ax.set_title(f"Gráfico da função {funcao}(x)", fontsize=14)
+    ax.grid(True, linestyle="--")
+
+elif grafico_escolhido == "Distribuição Normal":
+    media = st.slider("Média (μ)", -3.0, 3.0, 0.0, step=0.1)
+    desvio_padrao = st.slider("Desvio Padrão (σ)", 0.1, 2.0, 1.0, step=0.1)
+    x = np.linspace(media - 3 * desvio_padrao, media + 3 * desvio_padrao, 100)
+    y = (1 / (desvio_padrao * np.sqrt(2 * np.pi))) * np.exp(-0.5 * ((x - media) / desvio_padrao) ** 2)
+
+    fig, ax = plt.subplots(figsize=(10, 5))
+    ax.plot(x, y, color="purple", linewidth=2)
+    ax.set_xlabel("x", fontsize=12)
+    ax.set_ylabel("Densidade de Probabilidade", fontsize=12)
+    ax.set_title(f"Distribuição Normal (μ={media}, σ={desvio_padrao})", fontsize=14)
+    ax.grid(True, linestyle="--")
+    ax.fill_between(x, y, color="purple", alpha=0.3)  # Preenchimento sob a curva
+
+elif grafico_escolhido == "Gráfico de Barras":
+    categorias = ["Maçã", "Banana", "Laranja", "Uva", "Pera"]
+    valores = np.random.randint(10, 50, len(categorias))
+
+    fig, ax = plt.subplots(figsize=(10, 5))
+    cores = colormaps.get_cmap("tab20c").colors  # Uso do colormaps
+    ax.bar(categorias, valores, color=cores)
+    ax.set_xlabel("Frutas", fontsize=12)
+    ax.set_ylabel("Quantidade", fontsize=12)
+    ax.set_title("Gráfico de Barras de Frutas", fontsize=14)
+    for i, v in enumerate(valores):
+        ax.text(i, v + 1, str(v), ha="center", va="bottom")  # Rótulos nas barras
+
+elif grafico_escolhido == "Dispersão 3D":
+    np.random.seed(0)
+    n = 100
+    x = np.random.rand(n)
+    y = np.random.rand(n)
+    z = np.random.rand(n)
+    cores = colormaps.get_cmap("viridis")(z)  # Uso do colormaps
+
+    fig = plt.figure(figsize=(10, 6))
+    ax = fig.add_subplot(111, projection="3d")
+    ax.scatter(x, y, z, c=cores, marker="o", s=50)
+    ax.set_xlabel("X", fontsize=12)
+    ax.set_ylabel("Y", fontsize=12)
+    ax.set_zlabel("Z", fontsize=12)
+    ax.set_title("Gráfico de Dispersão 3D", fontsize=14)
 
 # Exibe o gráfico
-
-st.columns([1,4,1])[1].pyplot(fig)
-
-st.markdown("### :tada[Personalize os parâmetros da função usando os sliders! 🎉]")
+st.pyplot(fig)
