@@ -1,41 +1,52 @@
 import streamlit as st
-import scr.estilo
+import src.estilo
 
-scr.estilo.menu_lateral(pagina="Sobre o Chat Construtor")
+src.estilo.menu_lateral(pagina="Sobre o Chat Construtor")
 
 st.title("Sobre o Chat Construtor")
 
-st.markdown("""
-    O Chat Construtor é uma ferramenta poderosa para desenvolvedores de aplicações Streamlit. 
-    Ele permite que você crie, modifique e gerencie seu projeto de forma rápida e eficiente, 
-    usando a inteligência artificial para gerar código automaticamente.
+with st.container():
+    st.markdown(
+        """
+        O Chat Construtor é seu assistente de desenvolvimento Streamlit, 
+        impulsionado pela inteligência artificial do Google Gemini. 
+        Ele transforma suas ideias em código funcional, agilizando a criação e 
+        o gerenciamento de suas aplicações.
+        """,
+    )
 
-    ## Como funciona?
+st.subheader("Como a mágica acontece?")
 
-    O Chat Construtor usa o modelo de linguagem **Gemini** para entender suas instruções e gerar o código Streamlit desejado. 
-    Basta digitar seus requisitos e o Chat Construtor fará o resto! 
+st.markdown(
+    """
+    1. **Você descreve:** Conte ao Chat Construtor o que você deseja criar.
+    2. **Gemini entende:** O modelo de linguagem Gemini interpreta suas instruções.
+    3. **Código é gerado:** Gemini transforma suas ideias em código Streamlit pronto para usar.
+    4. **Você refina:** Revise e ajuste o código gerado para atender às suas necessidades.
+    5. **Sua aplicação ganha vida:** Execute o código e veja sua visão se tornar realidade!
+    """
+)
 
-    ## Recursos:
+with st.expander("Recursos que vão te surpreender:",expanded=True):
+    st.markdown(
+        """
+        * **Criação de páginas, componentes e funcionalidades:** Do layout à lógica, o Chat Construtor te ajuda em cada etapa.
+        * **Gerenciamento inteligente de arquivos:** Organize seu projeto com facilidade.
+        * **Visualização de dados:** Gere gráficos e tabelas interativas para analisar seus dados.
+        * **Upload e análise de arquivos:** Carregue seus próprios dados para explorar e transformar.
+        """
+    )
 
-    * **Geração de Código Automática:** Crie páginas, componentes e funcionalidades com facilidade.
-    * **Integração com o Gemini:** Acesse a inteligência artificial avançada do Gemini para obter resultados precisos.
-    * **Gerenciamento de Arquivos:** Organize seu projeto com a função de gerenciamento de arquivos.
+st.markdown("---")
 
-    ## Começando:
+st.subheader("Observações importantes:")
 
-    1. **Digite suas instruções:** Explique o que você deseja que o Chat Construtor faça.
-    2. **Revise o código gerado:** Verifique se o código atende às suas necessidades.
-    3. **Execute o código:** Execute o código gerado em seu ambiente Streamlit.
+st.markdown(
+    """
+    * O Chat Construtor ainda está em desenvolvimento e aprendendo a cada dia.
+    * Se encontrar algum erro ou tiver sugestões, compartilhe conosco para que possamos melhorar!
+    * O Chat Construtor é uma ferramenta poderosa, mas não substitui o conhecimento em programação. Use-o como um aliado para impulsionar sua criatividade!
+    """
+)
 
-    ## Observações:
-
-    * O Chat Construtor ainda está em desenvolvimento. 
-    * Se você encontrar algum erro, por favor, relate-o para que possamos melhorá-lo.
-    * O Chat Construtor é uma ferramenta poderosa, mas não substitui o conhecimento de programação.
-
-    ## Explore e experimente!
-""")
-
-st.markdown(f"### :rainbow[Essa página foi criada automaticamente pelo Chat Construtor! 🎉]")
-
-st.image("https://www.robotlab.com/hubfs/NAO%20V6%20-%20TOP.png",)
+st.markdown("**Essa página foi criada automaticamente pelo Chat Construtor!** 🎉")

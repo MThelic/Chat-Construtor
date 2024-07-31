@@ -1,10 +1,10 @@
 import streamlit as st
 import os
-import scr.estilo
-scr.estilo.menu_lateral()
+from src.estilo import menu_lateral
+menu_lateral()
 
 st.title("Lista de Códigos")
-st.markdown("## Selecione um arquivo .py para visualizar seu conteúdo:")
+st.markdown("### Selecione um arquivo .py para visualizar seu conteúdo:")
 
 arquivos = {}
 for root, _, files in os.walk('.'):

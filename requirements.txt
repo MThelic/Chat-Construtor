@@ -10,3 +10,4 @@ streamlit_sortables
 networkx
 workadays
 streamlit_extras
+tabulate

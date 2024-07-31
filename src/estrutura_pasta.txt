@@ -1,0 +1,728 @@
+Estrutura da Pasta:
+auto-construtor/
+    .gitignore
+    main.py
+    README.md
+    requirements.txt
+    .streamlit/
+        config.toml
+        secrets.toml
+    assets/
+        logo_dark.png
+        logo_dark_2.png
+        logo_icone_rgb.ico
+        logo_light.png
+    base/
+        .gitkeep.txt
+        estoque.csv
+        vendas.csv
+        imagens/
+        Insights/
+            Teste Gemini.xlsx
+    pages/
+        em_casa.py
+        estrutura.py
+        gastos_mensais.py
+        grafico_gauss.py
+        insights.py
+        listar_codigos.py
+        sobre.py
+    src/
+        constantes.py
+        estilo.py
+        estilos.css
+        estrutura_pasta.txt
+        gemini.py
+        instrucoes_gemini.txt
+        ler_pastas.py
+        modificar_arquivos.py
+
+
+
+Nome do Arquivo:main.py
+Código:import streamlit as st
+import src.gemini
+import src.estilo
+
+def main():
+    """Função principal para executar o chatbot."""
+    src.estilo.menu_lateral()
+    st.markdown('## CHAT CONSTRUTOR')
+
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
+
+    user_input = st.chat_input("Digite seu texto:")
+
+    if user_input:
+        try:
+            st.session_state.messages.append({"role": "user", "parts": user_input})
+            prompt = "LEMBRE-SE DE TODAS AS INSTRUÇÕES!! " + user_input
+            response = src.gemini.call_google_gemini_api(prompt)
+            st.session_state.messages.append({"role": "model", "parts": response})
+            st.rerun()
+        except Exception as e:
+            st.error(f"Erro ao processar a resposta: {e}")
+
+    for message in st.session_state.messages:
+        with st.chat_message(message["role"] if message["role"]=='user' else 'ai'):
+            st.markdown(message["parts"])
+
+    if not user_input and not st.session_state.messages:
+        try:
+            sugestao = src.gemini.call_google_gemini_api('Gere uma sugestão de prompt para o chat do Streamlit.')
+            sugestao = sugestao.strip('Resposta: ').strip()  # Remove "Resposta:" e espaços extras
+            st.chat_message("ai").markdown(f"Experimente: *{sugestao}*")
+        except Exception as e:
+            st.error(f"Erro ao gerar sugestão: {e}")
+
+if __name__ == "__main__":
+    main()
+
+
+
+Nome do Arquivo:em_casa.py
+Código:import streamlit as st
+import json
+import os
+import pandas as pd
+import random
+import string
+from src.estilo import menu_lateral
+menu_lateral()
+
+def gerar_chave_aleatoria(tamanho=10):
+    return ''.join(random.choices(string.ascii_letters + string.digits, k=tamanho))
+
+st.title("Em Casa")
+
+opcao = st.radio("Selecione uma opção:", ("Vendas", "Estoque"), horizontal=True)
+
+if opcao == "Vendas":
+    st.markdown("## Cadastro de Vendas")
+
+    # Gera uma chave aleatória
+    chave_aleatoria = gerar_chave_aleatoria()
+
+    # Exibe a chave aleatória
+    st.text(f"ID da Venda: {chave_aleatoria}")
+
+    # Lista de itens
+    itens = [
+        "Berinjela",
+        "Mini Pizza",
+        "Torta",
+        "Esfiha",
+        "Pastas Árabes"
+    ]
+
+    # Cria a lista suspensa com os itens
+    produto = st.selectbox("Produto", itens)
+
+    quantidade = st.number_input("Quantidade", min_value=1, step=1)
+    valor_unitario = st.number_input("Valor Unitário", min_value=0.01, step=0.01)
+    data_venda = st.date_input("Data da Venda")
+
+    # Botão para salvar venda
+    if st.button("Salvar Venda"):
+        st.success("Venda salva com sucesso!")
+
+        # Cria o DataFrame com os dados da venda
+        data = {'id': [chave_aleatoria], 'produto': [produto], 'quantidade': [quantidade], 'valor_unitario': [valor_unitario], 'data_venda': [data_venda.strftime('%Y-%m-%d')]}
+        df = pd.DataFrame(data)
+
+        # Salva o DataFrame em um arquivo CSV
+        df.to_csv('base/vendas.csv', mode='a', index=False, header=True)
+
+elif opcao == "Estoque":
+    st.markdown("## Cadastro de Estoque")
+
+    # Gera uma chave aleatória para o ID do estoque
+    chave_estoque = gerar_chave_aleatoria()
+
+    # Exibe a chave aleatória
+    st.text(f"ID do Estoque: {chave_estoque}")
+
+    # Lista de itens
+    itens = [
+        "Berinjela",
+        "Mini Pizza",
+        "Torta",
+        "Esfiha",
+        "Pastas Árabes"
+    ]
+
+    # Cria a lista suspensa com os itens
+    produto_estoque = st.selectbox("Produto", itens)
+
+    quantidade_estoque = st.number_input("Quantidade", min_value=0, step=1)
+    data_entrada = st.date_input("Data de Entrada")
+
+    # Botão para salvar estoque
+    if st.button("Salvar Estoque"):
+        st.success("Estoque salvo com sucesso!")
+
+        # Cria o DataFrame com os dados do estoque
+        data = {'id': [chave_estoque], 'produto': [produto_estoque], 'quantidade': [quantidade_estoque], 'data_entrada': [data_entrada.strftime('%Y-%m-%d')]}
+        df = pd.DataFrame(data)
+
+        # Salva o DataFrame em um arquivo CSV
+        df.to_csv('base/estoque.csv', mode='a', index=False, header=True)
+
+
+
+Nome do Arquivo:estrutura.py
+Código:import streamlit as st
+import os
+from src.estilo import menu_lateral
+menu_lateral()
+
+st.title("Estrutura do Projeto")
+
+def gerar_estrutura_diagrama(pasta_raiz):
+    """Gera um diagrama da estrutura de pastas e arquivos."""
+    estrutura = []
+    for root, dirs, files in os.walk(pasta_raiz):
+        if '.git' in root or 'pycache' in root: continue
+        level = root.replace(pasta_raiz, '').count(os.sep)
+        indent = '  ' * level
+        estrutura.append(f"{indent}{os.path.basename(root)}/")
+        for file in files:
+            estrutura.append(f"{indent}  - {file}")
+    return estrutura
+
+# Obtém a estrutura do projeto
+pasta_raiz = os.getcwd()
+estrutura_diagrama = gerar_estrutura_diagrama(pasta_raiz)
+
+# Exibe a estrutura
+st.markdown("```\n" + "\n".join(estrutura_diagrama) + "\n```")
+
+
+
+
+Nome do Arquivo:gastos_mensais.py
+Código:import streamlit as st
+import pandas as pd
+import matplotlib.pyplot as plt
+from src.estilo import menu_lateral
+
+menu_lateral()
+
+st.title("Gastos Mensais da Empresa")
+
+# Dados fictícios dos gastos
+dados = {
+    "Mês": ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho"],
+    "Salário": [10000, 12000, 11000, 13000, 14000, 15000],
+    "Aluguel": [2000, 2000, 2000, 2000, 2000, 2000],
+    "Energia": [500, 600, 550, 700, 650, 800],
+    "Outros": [1000, 1200, 1100, 1300, 1400, 1500],
+}
+df = pd.DataFrame(dados)
+
+# Opções de meses para o usuário escolher
+meses = df["Mês"].unique()
+mes_selecionado = st.selectbox("Selecione o mês:", meses)
+
+# Filtra os dados para o mês selecionado
+df_mes = df[df["Mês"] == mes_selecionado]
+gastos = df_mes.drop("Mês", axis=1).sum()
+
+# Cria o gráfico de pizza
+fig, ax = plt.subplots()
+ax.pie(gastos, labels=gastos.index, autopct="%1.1f%%", startangle=90)
+ax.axis("equal")
+ax.set_title(f"Gastos em {mes_selecionado}")
+
+# Exibe o gráfico
+st.pyplot(fig)
+
+
+
+Nome do Arquivo:grafico_gauss.py
+Código:import streamlit as st
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib import colormaps  # Importa o módulo colormaps
+from src.estilo import menu_lateral
+
+menu_lateral()
+
+st.title("Explorador de Gráficos Interativos")
+
+st.markdown(
+    """
+    Explore diferentes tipos de gráficos e visualize como seus parâmetros influenciam seu 
+    comportamento. Descubra padrões, tendências e relações nos dados de forma interativa!
+    """
+)
+
+# Lista suspensa para escolher o tipo de gráfico
+grafico_escolhido = st.selectbox(
+    "Selecione o tipo de gráfico:",
+    ("Funções Matemáticas", "Distribuição Normal", "Gráfico de Barras", "Dispersão 3D"),
+)
+
+# Parâmetros e plotagem do gráfico escolhido
+if grafico_escolhido == "Funções Matemáticas":
+    funcao = st.selectbox("Escolha a função:", ("seno", "cosseno", "tangente", "exponencial"))
+    x = np.linspace(-2 * np.pi, 2 * np.pi, 400)
+
+    if funcao == "seno":
+        y = np.sin(x)
+    elif funcao == "cosseno":
+        y = np.cos(x)
+    elif funcao == "tangente":
+        y = np.tan(x)
+    else:  # exponencial
+        y = np.exp(x)
+
+    fig, ax = plt.subplots(figsize=(10, 5))
+    ax.plot(x, y, color="blue", linewidth=2)
+    ax.set_xlabel("x", fontsize=12)
+    ax.set_ylabel("f(x)", fontsize=12)
+    ax.set_title(f"Gráfico da função {funcao}(x)", fontsize=14)
+    ax.grid(True, linestyle="--")
+
+elif grafico_escolhido == "Distribuição Normal":
+    media = st.slider("Média (μ)", -3.0, 3.0, 0.0, step=0.1)
+    desvio_padrao = st.slider("Desvio Padrão (σ)", 0.1, 2.0, 1.0, step=0.1)
+    x = np.linspace(media - 3 * desvio_padrao, media + 3 * desvio_padrao, 100)
+    y = (1 / (desvio_padrao * np.sqrt(2 * np.pi))) * np.exp(-0.5 * ((x - media) / desvio_padrao) ** 2)
+
+    fig, ax = plt.subplots(figsize=(10, 5))
+    ax.plot(x, y, color="purple", linewidth=2)
+    ax.set_xlabel("x", fontsize=12)
+    ax.set_ylabel("Densidade de Probabilidade", fontsize=12)
+    ax.set_title(f"Distribuição Normal (μ={media}, σ={desvio_padrao})", fontsize=14)
+    ax.grid(True, linestyle="--")
+    ax.fill_between(x, y, color="purple", alpha=0.3)  # Preenchimento sob a curva
+
+elif grafico_escolhido == "Gráfico de Barras":
+    categorias = ["Maçã", "Banana", "Laranja", "Uva", "Pera"]
+    valores = np.random.randint(10, 50, len(categorias))
+
+    fig, ax = plt.subplots(figsize=(10, 5))
+    cores = colormaps.get_cmap("tab20c").colors  # Uso do colormaps
+    ax.bar(categorias, valores, color=cores)
+    ax.set_xlabel("Frutas", fontsize=12)
+    ax.set_ylabel("Quantidade", fontsize=12)
+    ax.set_title("Gráfico de Barras de Frutas", fontsize=14)
+    for i, v in enumerate(valores):
+        ax.text(i, v + 1, str(v), ha="center", va="bottom")  # Rótulos nas barras
+
+elif grafico_escolhido == "Dispersão 3D":
+    np.random.seed(0)
+    n = 100
+    x = np.random.rand(n)
+    y = np.random.rand(n)
+    z = np.random.rand(n)
+    cores = colormaps.get_cmap("viridis")(z)  # Uso do colormaps
+
+    fig = plt.figure(figsize=(10, 6))
+    ax = fig.add_subplot(111, projection="3d")
+    ax.scatter(x, y, z, c=cores, marker="o", s=50)
+    ax.set_xlabel("X", fontsize=12)
+    ax.set_ylabel("Y", fontsize=12)
+    ax.set_zlabel("Z", fontsize=12)
+    ax.set_title("Gráfico de Dispersão 3D", fontsize=14)
+
+# Exibe o gráfico
+st.pyplot(fig)
+
+
+
+Nome do Arquivo:insights.py
+Código:import streamlit as st
+import os
+import pandas as pd
+from src.gemini import call_google_gemini_api
+from src.estilo import menu_lateral
+
+# Aplicando estilo da página (menu lateral)
+menu_lateral()
+
+st.title("Insights")
+
+# Caminho da pasta para salvar os arquivos
+insights_path = "base/Insights"
+os.makedirs(insights_path, exist_ok=True)  # Cria a pasta se não existir
+
+# Função para obter os nomes dos arquivos na pasta Insights
+def get_insight_files():
+    return [f for f in os.listdir(insights_path) if f.endswith((".csv", ".xlsx", ".txt"))]
+
+# Configuração do uploader de arquivos
+uploaded_files = st.file_uploader(
+    "Faça upload dos seus arquivos (CSV, XLSX, TXT)",
+    type=["csv", "xlsx", "txt"],
+    accept_multiple_files=True,
+)
+
+# Processamento dos arquivos enviados
+if uploaded_files:
+    for file in uploaded_files:
+        filename = file.name
+        file_path = os.path.join(insights_path, filename)
+        with open(file_path, "wb") as f:
+            f.write(file.getbuffer())
+        st.success(f"Arquivo '{filename}' salvo com sucesso!")
+
+# Dropdown para selecionar arquivos existentes e botão para remover
+cols = st.columns([3, 1])
+with cols[0]:
+    selected_file = st.selectbox("Selecione um arquivo existente:", get_insight_files())
+with cols[1]:
+    st.subheader(' ')
+    if st.button("Remover Arquivo ❌", key=selected_file):  # Adiciona uma chave única para cada botão
+        file_path = os.path.join(insights_path, selected_file)
+        os.remove(file_path)
+        st.success("Arquivo removido com sucesso!")
+
+# Botão para obter insights
+if st.button("Obter Insights"):
+    if selected_file:
+        file_path = os.path.join(insights_path, selected_file)
+        try:
+            if selected_file.endswith((".csv", ".xlsx")):
+                df = pd.read_csv(file_path) if selected_file.endswith(".csv") else pd.read_excel(file_path)
+                insight_data = f"**{selected_file}:**\n{df.head().to_markdown(index=False, numalign='left', stralign='left')}"
+            else:
+                with open(file_path, "r", encoding="utf-8") as f:
+                    content = f.read()
+                insight_data = f"**{selected_file}:**\n{content}"
+
+            prompt = f"Obtenha insights sobre esses dados:\n\n{insight_data}"
+            with st.spinner("Gerando insights..."):
+                response = call_google_gemini_api(prompt)
+                st.write(response)
+        except Exception as e:
+            st.error(f"Erro ao ler o arquivo '{selected_file}': {e}")
+    else:
+        st.warning("Selecione um arquivo ou faça upload de um novo para obter insights.")
+
+
+
+Nome do Arquivo:listar_codigos.py
+Código:import streamlit as st
+import os
+from src.estilo import menu_lateral
+menu_lateral()
+
+st.title("Lista de Códigos")
+st.markdown("### Selecione um arquivo .py para visualizar seu conteúdo:")
+
+arquivos = {}
+for root, _, files in os.walk('.'):
+    for file in files:
+        if file.endswith('.py'):
+            arquivos[file] = os.path.join(root, file)
+
+cols=st.columns([3,1])
+arquivo_selecionado = cols[0].selectbox("Selecione um arquivo:", list(arquivos.keys()))
+
+if arquivo_selecionado:
+    with open(arquivos[arquivo_selecionado], "r", encoding='utf-8') as f:
+        codigo = f.read()
+    st.code(codigo, language="python")
+    cols[1].download_button("Baixar código", codigo, file_name=arquivo_selecionado)
+
+
+
+Nome do Arquivo:sobre.py
+Código:import streamlit as st
+import src.estilo
+
+src.estilo.menu_lateral(pagina="Sobre o Chat Construtor")
+
+st.title("Sobre o Chat Construtor")
+
+with st.container():
+    st.markdown(
+        """
+        O Chat Construtor é seu assistente de desenvolvimento Streamlit, 
+        impulsionado pela inteligência artificial do Google Gemini. 
+        Ele transforma suas ideias em código funcional, agilizando a criação e 
+        o gerenciamento de suas aplicações.
+        """,
+    )
+
+st.subheader("Como a mágica acontece?")
+
+st.markdown(
+    """
+    1. **Você descreve:** Conte ao Chat Construtor o que você deseja criar.
+    2. **Gemini entende:** O modelo de linguagem Gemini interpreta suas instruções.
+    3. **Código é gerado:** Gemini transforma suas ideias em código Streamlit pronto para usar.
+    4. **Você refina:** Revise e ajuste o código gerado para atender às suas necessidades.
+    5. **Sua aplicação ganha vida:** Execute o código e veja sua visão se tornar realidade!
+    """
+)
+
+with st.expander("Recursos que vão te surpreender:",expanded=True):
+    st.markdown(
+        """
+        * **Criação de páginas, componentes e funcionalidades:** Do layout à lógica, o Chat Construtor te ajuda em cada etapa.
+        * **Gerenciamento inteligente de arquivos:** Organize seu projeto com facilidade.
+        * **Visualização de dados:** Gere gráficos e tabelas interativas para analisar seus dados.
+        * **Upload e análise de arquivos:** Carregue seus próprios dados para explorar e transformar.
+        """
+    )
+
+st.markdown("---")
+
+st.subheader("Observações importantes:")
+
+st.markdown(
+    """
+    * O Chat Construtor ainda está em desenvolvimento e aprendendo a cada dia.
+    * Se encontrar algum erro ou tiver sugestões, compartilhe conosco para que possamos melhorar!
+    * O Chat Construtor é uma ferramenta poderosa, mas não substitui o conhecimento em programação. Use-o como um aliado para impulsionar sua criatividade!
+    """
+)
+
+st.markdown("**Essa página foi criada automaticamente pelo Chat Construtor!** 🎉")
+
+
+
+Nome do Arquivo:constantes.py
+Código:PAGINAS={'main.py': ['Chat Construtor', '💻'], 'pages/sobre.py': ['Sobre o Chat Construtor', '🤖'], 'pages/estrutura.py': ['Estrutura do Projeto', '🗄️'], 'pages/listar_codigos.py': ['Lista de Códigos', '📃'], 'pages/grafico_gauss.py': ['Gráfico Interativo', '📊'], 'pages/em_casa.py': ['Em Casa', '🏠'], 'pages/insights.py': ['Insights', '🧪'], 'pages/gastos_mensais.py': ['Gastos Mensais', '📈']}
+
+
+
+Nome do Arquivo:estilo.py
+Código:import streamlit as st
+from streamlit.errors import StreamlitAPIException
+from PIL import Image
+from pathlib import Path
+import base64
+import src.constantes
+
+def importar_assets():
+    def abrir_imagem(path):
+        return Image.open(Path(path))
+    def abrir_imagem_base64(path):
+        return base64.b64encode(Path(path).read_bytes()).decode()
+
+    assets={
+        'logo_ico': abrir_imagem('assets/logo_icone_rgb.ico'),
+        'logo_dark': abrir_imagem('assets/logo_dark.png'),
+        'logo_light': abrir_imagem('assets/logo_light.png'),
+        'logo_dark_base64':abrir_imagem_base64('assets/logo_dark.png')
+    }
+    return assets
+
+def importar_estilos():
+    with open(r"src/estilos.css", "r") as f:
+        css = f.read()
+    return css
+
+def aplicar_estilos(*classes, texto="", imagem=None, link=None, link_pagina=None):
+    css = importar_estilos()
+    classes_str = " ".join(classes)
+    if imagem != None:
+        elemento = f"<img src=data:image/png;base64,{imagem}>"
+    else:
+        elemento = texto
+    div = f"""<div class="{classes_str}">{elemento}</div>"""
+    if link != None:
+        div = f"<a href='{link}'>{div}</a>"
+    elif link_pagina != None:
+        div = f"<a href='{link_pagina}' target='_self'>{div}</a>"
+
+    return f"""<style>{css}</style>{div}"""
+
+def menu_lateral(pagina="Chat Construtor"):
+    if pagina != "Chat Construtor" and "Bug Iniciar" not in st.session_state:
+        st.session_state["Bug Iniciar"] = True
+        st.rerun()
+    assets = importar_assets()
+    try:
+        st.set_page_config(
+            page_title="Chat Construtor", page_icon=assets["logo_ico"], layout="wide"
+        )
+    except StreamlitAPIException:
+        pass
+    with st.sidebar:
+        st.markdown(
+            aplicar_estilos(
+                "imagens", link_pagina="", imagem=assets["logo_dark_base64"]
+            ),
+            unsafe_allow_html=True,
+        )
+        st.divider()
+        st.subheader("MENU EM CONSTRUÇÃO")
+        for pag, value in src.constantes.PAGINAS.items():
+            try:st.page_link(pag, label=value[0], icon=value[1])
+            except Exception as e: st.warning(e)
+
+
+
+Nome do Arquivo:gemini.py
+Código:import google.generativeai as genai
+import src.ler_pastas
+import src.modificar_arquivos
+import streamlit as st
+import os
+from google.generativeai.types import HarmCategory, HarmBlockThreshold
+
+genai.configure(api_key=st.secrets['API_KEY'])
+
+generation_config = { "temperature": 1, "top_p": 0.95, "top_k": 64, "max_output_tokens": 20000, "response_mime_type": "text/plain"}
+
+model = genai.GenerativeModel( model_name="gemini-1.5-flash", generation_config=generation_config,safety_settings={HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_ONLY_HIGH})
+
+def call_google_gemini_api(text):
+    instrucoes = open(r'src/instrucoes_gemini.txt', 'r', encoding='utf-8').read()
+    codigo_atual=src.ler_pastas.read_folder_structure_and_files()
+    chat_session = model.start_chat( history=[ { "role": "user", "parts": [instrucoes + codigo_atual]}]+st.session_state.messages)
+    response = chat_session.send_message(text)
+    response_text = response.text
+    
+    return src.modificar_arquivos.ler_resposta(response_text)
+
+
+
+Nome do Arquivo:ler_pastas.py
+Código:import os
+
+def read_folder_structure_and_files():
+    folder_path = os.getcwd()
+    print(folder_path)
+    folder_structure = []
+    python_files = []
+
+    # Coletando a estrutura das pastas e arquivos Python (ignorando .git e __pycache__)
+    for root, dirs, files in os.walk(folder_path):
+        # Exclude '.git' and '__pycache__' directories
+        excluded_dirs = ['.git', '__pycache__']
+        for dir_name in excluded_dirs:
+            if dir_name in dirs:
+                dirs.remove(dir_name)
+
+        level = root.replace(folder_path, '').count(os.sep)
+        indent = ' ' * 4 * level
+        folder_structure.append(f"{indent}{os.path.basename(root)}/")
+        subindent = ' ' * 4 * (level + 1)
+        for file in files:
+            folder_structure.append(f"{subindent}{file}")
+            if file.endswith('.py'):
+                file_path = os.path.join(root, file)
+                python_files.append(file_path)
+
+    # Construindo o conteúdo a ser retornado
+    output_content = "Estrutura da Pasta:\n"
+    output_content += "\n".join(folder_structure)
+    output_content += "\n\n"
+
+    for file_path in python_files:
+        with open(file_path, 'r', encoding='utf-8') as py_file:
+            file_content = py_file.read()
+            output_content += "\n\n"
+            output_content += f"Nome do Arquivo:{os.path.basename(file_path)}\n"
+            output_content += f"Código:{file_content}\n\n"
+    open(r'src/estrutura_pasta.txt', 'w', encoding='utf-8').write(output_content)
+
+    return output_content
+
+
+
+Nome do Arquivo:modificar_arquivos.py
+Código:import os
+import shutil
+import src.constantes
+
+def add_pagina(configuracao):
+    """Adiciona uma nova página à lista de páginas."""
+    try:
+        pag = src.constantes.PAGINAS
+        pag[configuracao[0]] = [configuracao[1], configuracao[2]]
+        with open(r"src/constantes.py", "w", encoding='utf-8') as f:
+            f.write("PAGINAS=" + str(pag))
+    except IndexError:
+        return "Erro: Formato de configuração de página inválido."
+
+def remover_pagina(value):
+    """Remove uma página da lista de páginas."""
+    pag = src.constantes.PAGINAS
+    if value in pag:
+        pag.pop(value)
+        with open(r"src/constantes.py", "w", encoding='utf-8') as f:
+            f.write("PAGINAS=" + str(pag))
+    else:
+        return f"Erro: Página '{value}' não encontrada."
+
+def executar_chat(value):
+    """Retorna a resposta do chat."""
+    return f'Resposta: {value}'
+
+def executar_criar_pasta(value):
+    """Cria uma nova pasta."""
+    value = value.strip()
+    try:
+        os.makedirs(value, exist_ok=True)
+        return f'Pasta {value} criada'
+    except Exception as e:
+        return f"Erro ao criar a pasta '{value}': {e}"
+
+def executar_deletar(value):
+    """Deleta um arquivo ou pasta."""
+    value = value.strip()
+    caminho = os.path.abspath(value)
+    try:
+        if os.path.isfile(caminho):
+            os.remove(caminho)
+            if 'pages' in value:
+                remover_pagina(value)
+            return f'Página {value} excluída'
+        elif os.path.isdir(caminho):
+            shutil.rmtree(caminho)
+            return f'Pasta {value} excluída'
+        else:
+            return f'O caminho {value} não existe.'
+    except Exception as e:
+        return f"Erro ao deletar '{value}': {e}"
+
+def executar_criar_pagina(key, value):
+    """Cria uma nova página no projeto."""
+    try:
+        configuracao = key.split(',')
+        add_pagina(configuracao)
+        with open(f"{configuracao[0]}", "w", encoding='utf-8') as f:
+            f.write(value)
+        return f'Página {configuracao[2]} {configuracao[1]}'
+    except Exception as e:
+        return f"Erro ao criar a página '{configuracao[0]}': {e}"
+
+def executar_modificar_arquivo(key, value):
+    """Modifica um arquivo existente."""
+    try:
+        with open(f"{key}", "w", encoding='utf-8') as f:
+            f.write(value)
+        return f'Arquivo {key} modificado'
+    except Exception as e:
+        return f"Erro ao modificar o arquivo '{key}': {e}"
+
+def executar_comando(key, value):
+    """Executa um comando com base na chave e no valor fornecidos."""
+    if key == 'chat':
+        return executar_chat(value)
+    elif key == 'criar':
+        return executar_criar_pasta(value)
+    elif key == 'deletar':
+        return executar_deletar(value)
+    elif ',' in key:
+        return executar_criar_pagina(key, value)
+    else:
+        return executar_modificar_arquivo(key, value)
+
+def ler_resposta(response_text):
+    """Lê e processa a resposta do modelo de linguagem."""
+    mensagens = []
+    lista = response_text.split('$')
+    dicionario = {item: lista[i + 1].strip('|') for i, item in enumerate(lista) if item and item[0] != '|'}
+    for key in dicionario:
+        mensagens.append(executar_comando(key, dicionario[key]))
+    return "\n".join(mensagens)
+

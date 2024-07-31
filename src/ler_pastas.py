@@ -6,8 +6,14 @@ def read_folder_structure_and_files():
     folder_structure = []
     python_files = []
 
-    # Coletando a estrutura das pastas e arquivos Python
+    # Coletando a estrutura das pastas e arquivos Python (ignorando .git e __pycache__)
     for root, dirs, files in os.walk(folder_path):
+        # Exclude '.git' and '__pycache__' directories
+        excluded_dirs = ['.git', '__pycache__']
+        for dir_name in excluded_dirs:
+            if dir_name in dirs:
+                dirs.remove(dir_name)
+
         level = root.replace(folder_path, '').count(os.sep)
         indent = ' ' * 4 * level
         folder_structure.append(f"{indent}{os.path.basename(root)}/")
@@ -29,6 +35,6 @@ def read_folder_structure_and_files():
             output_content += "\n\n"
             output_content += f"Nome do Arquivo:{os.path.basename(file_path)}\n"
             output_content += f"Código:{file_content}\n\n"
-    open(r'scr/estrutura_pasta.txt', 'w', encoding='utf-8').write(output_content)
+    open(r'src/estrutura_pasta.txt', 'w', encoding='utf-8').write(output_content)
 
     return output_content
