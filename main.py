@@ -5,7 +5,8 @@ import src.estilo
 def main():
     """Função principal para executar o chatbot."""
     src.estilo.menu_lateral()
-    st.markdown('## CHAT CONSTRUTOR')
+    st.markdown('### CHAT CONSTRUTOR')
+    st.text('Recarregue a página ou clique em rerun para ver algumas alterações.')
 
     if "messages" not in st.session_state:
         st.session_state.messages = []
@@ -18,7 +19,6 @@ def main():
             prompt = "LEMBRE-SE DE TODAS AS INSTRUÇÕES!! " + user_input
             response = src.gemini.call_google_gemini_api(prompt)
             st.session_state.messages.append({"role": "model", "parts": response})
-            st.rerun()
         except Exception as e:
             st.error(f"Erro ao processar a resposta: {e}")
 

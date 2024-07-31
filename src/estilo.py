@@ -61,4 +61,4 @@ def menu_lateral(pagina="Chat Construtor"):
         st.subheader("MENU EM CONSTRUÇÃO")
         for pag, value in src.constantes.PAGINAS.items():
             try:st.page_link(pag, label=value[0], icon=value[1])
-            except Exception as e: st.warning(e)
+            except Exception: st.warning('Recarregue a página apertando R para visualizar as alterações. Ou clique em Rerun')

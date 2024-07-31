@@ -10,7 +10,7 @@ menu_lateral()
 st.title("Insights")
 
 # Caminho da pasta para salvar os arquivos
-insights_path = "base/Insights"
+insights_path = "base/insights"
 os.makedirs(insights_path, exist_ok=True)  # Cria a pasta se não existir
 
 # Função para obter os nomes dos arquivos na pasta Insights

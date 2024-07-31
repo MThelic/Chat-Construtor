@@ -48,7 +48,7 @@ if opcao == "Vendas":
         df = pd.DataFrame(data)
 
         # Salva o DataFrame em um arquivo CSV
-        df.to_csv('base/vendas.csv', mode='a', index=False, header=True)
+        df.to_csv('base/bd_em_casa/vendas.csv', mode='a', index=False, header=True)
 
 elif opcao == "Estoque":
     st.markdown("## Cadastro de Estoque")
@@ -83,4 +83,4 @@ elif opcao == "Estoque":
         df = pd.DataFrame(data)
 
         # Salva o DataFrame em um arquivo CSV
-        df.to_csv('base/estoque.csv', mode='a', index=False, header=True)
+        df.to_csv('base/bd_em_casa/estoque.csv', mode='a', index=False, header=True)
