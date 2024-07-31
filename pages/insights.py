@@ -37,12 +37,13 @@ if uploaded_files:
 cols = st.columns([3, 1])
 with cols[0]:
     selected_file = st.selectbox("Selecione um arquivo existente:", get_insight_files())
-with cols[1]:
-    st.subheader(' ')
-    if st.button("Remover Arquivo ❌", key=selected_file):  # Adiciona uma chave única para cada botão
-        file_path = os.path.join(insights_path, selected_file)
-        os.remove(file_path)
-        st.success("Arquivo removido com sucesso!")
+if selected_file:
+    with cols[1]:
+        st.text(' ')
+        if st.button("Remover Arquivo ❌", key=selected_file):
+            file_path = os.path.join(insights_path, selected_file)
+            os.remove(file_path)
+            st.success("Arquivo removido com sucesso!")
 
 # Botão para obter insights
 if st.button("Obter Insights"):
