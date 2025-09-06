@@ -2,6 +2,7 @@ Estrutura da Pasta:
 auto-construtor/
     .gitignore
     main.py
+    O erro apontado não indica diretamente um problema no código da página `upload_planilha.py`
     README.md
     requirements.txt
     .streamlit/
@@ -14,19 +15,18 @@ auto-construtor/
         logo_light.png
     base/
         .gitkeep.txt
-        estoque.csv
-        vendas.csv
+        bd_em_casa/
+            estoque.csv
+            vendas.csv
         imagens/
-        Insights/
+        insights/
             Teste Gemini.xlsx
     pages/
-        em_casa.py
         estrutura.py
-        gastos_mensais.py
-        grafico_gauss.py
         insights.py
         listar_codigos.py
         sobre.py
+        upload_planilha.py
     src/
         constantes.py
         estilo.py
@@ -47,7 +47,8 @@ import src.estilo
 def main():
     """Função principal para executar o chatbot."""
     src.estilo.menu_lateral()
-    st.markdown('## CHAT CONSTRUTOR')
+    st.markdown('### CHAT CONSTRUTOR')
+    st.text('Recarregue a página ou clique em rerun para ver algumas alterações.')
 
     if "messages" not in st.session_state:
         st.session_state.messages = []
@@ -60,7 +61,6 @@ def main():
             prompt = "LEMBRE-SE DE TODAS AS INSTRUÇÕES!! " + user_input
             response = src.gemini.call_google_gemini_api(prompt)
             st.session_state.messages.append({"role": "model", "parts": response})
-            st.rerun()
         except Exception as e:
             st.error(f"Erro ao processar a resposta: {e}")
 
@@ -78,96 +78,6 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-
-Nome do Arquivo:em_casa.py
-Código:import streamlit as st
-import json
-import os
-import pandas as pd
-import random
-import string
-from src.estilo import menu_lateral
-menu_lateral()
-
-def gerar_chave_aleatoria(tamanho=10):
-    return ''.join(random.choices(string.ascii_letters + string.digits, k=tamanho))
-
-st.title("Em Casa")
-
-opcao = st.radio("Selecione uma opção:", ("Vendas", "Estoque"), horizontal=True)
-
-if opcao == "Vendas":
-    st.markdown("## Cadastro de Vendas")
-
-    # Gera uma chave aleatória
-    chave_aleatoria = gerar_chave_aleatoria()
-
-    # Exibe a chave aleatória
-    st.text(f"ID da Venda: {chave_aleatoria}")
-
-    # Lista de itens
-    itens = [
-        "Berinjela",
-        "Mini Pizza",
-        "Torta",
-        "Esfiha",
-        "Pastas Árabes"
-    ]
-
-    # Cria a lista suspensa com os itens
-    produto = st.selectbox("Produto", itens)
-
-    quantidade = st.number_input("Quantidade", min_value=1, step=1)
-    valor_unitario = st.number_input("Valor Unitário", min_value=0.01, step=0.01)
-    data_venda = st.date_input("Data da Venda")
-
-    # Botão para salvar venda
-    if st.button("Salvar Venda"):
-        st.success("Venda salva com sucesso!")
-
-        # Cria o DataFrame com os dados da venda
-        data = {'id': [chave_aleatoria], 'produto': [produto], 'quantidade': [quantidade], 'valor_unitario': [valor_unitario], 'data_venda': [data_venda.strftime('%Y-%m-%d')]}
-        df = pd.DataFrame(data)
-
-        # Salva o DataFrame em um arquivo CSV
-        df.to_csv('base/vendas.csv', mode='a', index=False, header=True)
-
-elif opcao == "Estoque":
-    st.markdown("## Cadastro de Estoque")
-
-    # Gera uma chave aleatória para o ID do estoque
-    chave_estoque = gerar_chave_aleatoria()
-
-    # Exibe a chave aleatória
-    st.text(f"ID do Estoque: {chave_estoque}")
-
-    # Lista de itens
-    itens = [
-        "Berinjela",
-        "Mini Pizza",
-        "Torta",
-        "Esfiha",
-        "Pastas Árabes"
-    ]
-
-    # Cria a lista suspensa com os itens
-    produto_estoque = st.selectbox("Produto", itens)
-
-    quantidade_estoque = st.number_input("Quantidade", min_value=0, step=1)
-    data_entrada = st.date_input("Data de Entrada")
-
-    # Botão para salvar estoque
-    if st.button("Salvar Estoque"):
-        st.success("Estoque salvo com sucesso!")
-
-        # Cria o DataFrame com os dados do estoque
-        data = {'id': [chave_estoque], 'produto': [produto_estoque], 'quantidade': [quantidade_estoque], 'data_entrada': [data_entrada.strftime('%Y-%m-%d')]}
-        df = pd.DataFrame(data)
-
-        # Salva o DataFrame em um arquivo CSV
-        df.to_csv('base/estoque.csv', mode='a', index=False, header=True)
 
 
 
@@ -201,138 +111,6 @@ st.markdown("```\n" + "\n".join(estrutura_diagrama) + "\n```")
 
 
 
-Nome do Arquivo:gastos_mensais.py
-Código:import streamlit as st
-import pandas as pd
-import matplotlib.pyplot as plt
-from src.estilo import menu_lateral
-
-menu_lateral()
-
-st.title("Gastos Mensais da Empresa")
-
-# Dados fictícios dos gastos
-dados = {
-    "Mês": ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho"],
-    "Salário": [10000, 12000, 11000, 13000, 14000, 15000],
-    "Aluguel": [2000, 2000, 2000, 2000, 2000, 2000],
-    "Energia": [500, 600, 550, 700, 650, 800],
-    "Outros": [1000, 1200, 1100, 1300, 1400, 1500],
-}
-df = pd.DataFrame(dados)
-
-# Opções de meses para o usuário escolher
-meses = df["Mês"].unique()
-mes_selecionado = st.selectbox("Selecione o mês:", meses)
-
-# Filtra os dados para o mês selecionado
-df_mes = df[df["Mês"] == mes_selecionado]
-gastos = df_mes.drop("Mês", axis=1).sum()
-
-# Cria o gráfico de pizza
-fig, ax = plt.subplots()
-ax.pie(gastos, labels=gastos.index, autopct="%1.1f%%", startangle=90)
-ax.axis("equal")
-ax.set_title(f"Gastos em {mes_selecionado}")
-
-# Exibe o gráfico
-st.pyplot(fig)
-
-
-
-Nome do Arquivo:grafico_gauss.py
-Código:import streamlit as st
-import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib import colormaps  # Importa o módulo colormaps
-from src.estilo import menu_lateral
-
-menu_lateral()
-
-st.title("Explorador de Gráficos Interativos")
-
-st.markdown(
-    """
-    Explore diferentes tipos de gráficos e visualize como seus parâmetros influenciam seu 
-    comportamento. Descubra padrões, tendências e relações nos dados de forma interativa!
-    """
-)
-
-# Lista suspensa para escolher o tipo de gráfico
-grafico_escolhido = st.selectbox(
-    "Selecione o tipo de gráfico:",
-    ("Funções Matemáticas", "Distribuição Normal", "Gráfico de Barras", "Dispersão 3D"),
-)
-
-# Parâmetros e plotagem do gráfico escolhido
-if grafico_escolhido == "Funções Matemáticas":
-    funcao = st.selectbox("Escolha a função:", ("seno", "cosseno", "tangente", "exponencial"))
-    x = np.linspace(-2 * np.pi, 2 * np.pi, 400)
-
-    if funcao == "seno":
-        y = np.sin(x)
-    elif funcao == "cosseno":
-        y = np.cos(x)
-    elif funcao == "tangente":
-        y = np.tan(x)
-    else:  # exponencial
-        y = np.exp(x)
-
-    fig, ax = plt.subplots(figsize=(10, 5))
-    ax.plot(x, y, color="blue", linewidth=2)
-    ax.set_xlabel("x", fontsize=12)
-    ax.set_ylabel("f(x)", fontsize=12)
-    ax.set_title(f"Gráfico da função {funcao}(x)", fontsize=14)
-    ax.grid(True, linestyle="--")
-
-elif grafico_escolhido == "Distribuição Normal":
-    media = st.slider("Média (μ)", -3.0, 3.0, 0.0, step=0.1)
-    desvio_padrao = st.slider("Desvio Padrão (σ)", 0.1, 2.0, 1.0, step=0.1)
-    x = np.linspace(media - 3 * desvio_padrao, media + 3 * desvio_padrao, 100)
-    y = (1 / (desvio_padrao * np.sqrt(2 * np.pi))) * np.exp(-0.5 * ((x - media) / desvio_padrao) ** 2)
-
-    fig, ax = plt.subplots(figsize=(10, 5))
-    ax.plot(x, y, color="purple", linewidth=2)
-    ax.set_xlabel("x", fontsize=12)
-    ax.set_ylabel("Densidade de Probabilidade", fontsize=12)
-    ax.set_title(f"Distribuição Normal (μ={media}, σ={desvio_padrao})", fontsize=14)
-    ax.grid(True, linestyle="--")
-    ax.fill_between(x, y, color="purple", alpha=0.3)  # Preenchimento sob a curva
-
-elif grafico_escolhido == "Gráfico de Barras":
-    categorias = ["Maçã", "Banana", "Laranja", "Uva", "Pera"]
-    valores = np.random.randint(10, 50, len(categorias))
-
-    fig, ax = plt.subplots(figsize=(10, 5))
-    cores = colormaps.get_cmap("tab20c").colors  # Uso do colormaps
-    ax.bar(categorias, valores, color=cores)
-    ax.set_xlabel("Frutas", fontsize=12)
-    ax.set_ylabel("Quantidade", fontsize=12)
-    ax.set_title("Gráfico de Barras de Frutas", fontsize=14)
-    for i, v in enumerate(valores):
-        ax.text(i, v + 1, str(v), ha="center", va="bottom")  # Rótulos nas barras
-
-elif grafico_escolhido == "Dispersão 3D":
-    np.random.seed(0)
-    n = 100
-    x = np.random.rand(n)
-    y = np.random.rand(n)
-    z = np.random.rand(n)
-    cores = colormaps.get_cmap("viridis")(z)  # Uso do colormaps
-
-    fig = plt.figure(figsize=(10, 6))
-    ax = fig.add_subplot(111, projection="3d")
-    ax.scatter(x, y, z, c=cores, marker="o", s=50)
-    ax.set_xlabel("X", fontsize=12)
-    ax.set_ylabel("Y", fontsize=12)
-    ax.set_zlabel("Z", fontsize=12)
-    ax.set_title("Gráfico de Dispersão 3D", fontsize=14)
-
-# Exibe o gráfico
-st.pyplot(fig)
-
-
-
 Nome do Arquivo:insights.py
 Código:import streamlit as st
 import os
@@ -346,7 +124,7 @@ menu_lateral()
 st.title("Insights")
 
 # Caminho da pasta para salvar os arquivos
-insights_path = "base/Insights"
+insights_path = "base/insights"
 os.makedirs(insights_path, exist_ok=True)  # Cria a pasta se não existir
 
 # Função para obter os nomes dos arquivos na pasta Insights
@@ -373,12 +151,13 @@ if uploaded_files:
 cols = st.columns([3, 1])
 with cols[0]:
     selected_file = st.selectbox("Selecione um arquivo existente:", get_insight_files())
-with cols[1]:
-    st.subheader(' ')
-    if st.button("Remover Arquivo ❌", key=selected_file):  # Adiciona uma chave única para cada botão
-        file_path = os.path.join(insights_path, selected_file)
-        os.remove(file_path)
-        st.success("Arquivo removido com sucesso!")
+if selected_file:
+    with cols[1]:
+        st.text(' ')
+        if st.button("Remover Arquivo ❌", key=selected_file):
+            file_path = os.path.join(insights_path, selected_file)
+            os.remove(file_path)
+            st.success("Arquivo removido com sucesso!")
 
 # Botão para obter insights
 if st.button("Obter Insights"):
@@ -486,8 +265,42 @@ st.markdown("**Essa página foi criada automaticamente pelo Chat Construtor!** �
 
 
 
+Nome do Arquivo:upload_planilha.py
+Código:import streamlit as st
+import pandas as pd
+from src.estilo import menu_lateral
+
+menu_lateral()
+
+st.title("Análise de Planilha")
+
+uploaded_file = st.file_uploader("Escolha uma planilha", type=["csv", "xlsx"])
+
+if uploaded_file is not None:
+    try:
+        if uploaded_file.name.endswith(".csv"):
+            df = pd.read_csv(uploaded_file)
+        elif uploaded_file.name.endswith(".xlsx"):
+            df = pd.read_excel(uploaded_file)
+        else:
+            st.error("Formato de arquivo inválido. Por favor, escolha um arquivo CSV ou XLSX.")
+            return
+
+        num_colunas = len(df.columns)
+        st.write(f"Número de colunas: {num_colunas}")
+
+        st.write("Tipos de coluna:")
+        for col in df.columns:
+            tipo_coluna = str(df[col].dtype)
+            st.write(f"- {col}: {tipo_coluna}")
+
+    except Exception as e:
+        st.error(f"Erro ao processar a planilha: {e}")
+
+
+
 Nome do Arquivo:constantes.py
-Código:PAGINAS={'main.py': ['Chat Construtor', '💻'], 'pages/sobre.py': ['Sobre o Chat Construtor', '🤖'], 'pages/estrutura.py': ['Estrutura do Projeto', '🗄️'], 'pages/listar_codigos.py': ['Lista de Códigos', '📃'], 'pages/grafico_gauss.py': ['Gráfico Interativo', '📊'], 'pages/em_casa.py': ['Em Casa', '🏠'], 'pages/insights.py': ['Insights', '🧪'], 'pages/gastos_mensais.py': ['Gastos Mensais', '📈']}
+Código:PAGINAS={'main.py': ['Chat Construtor', '💻'], 'pages/sobre.py': ['Sobre o Chat Construtor', '🤖'], 'pages/estrutura.py': ['Estrutura do Projeto', '🗄️'], 'pages/listar_codigos.py': ['Lista de Códigos', '📃'], 'pages/insights.py': ['Insights', '🧪'], 'pages/upload_planilha.py': ['Análise de Planilha', '📊'], 'O erro apontado não indica diretamente um problema no código da página `upload_planilha.py`': [' mas sim um erro de sintaxe durante a execução do Streamlit.  A mensagem  `SyntaxError: invalid syntax` e o traceback que mostra `ast.parse` falhando sugerem que o Streamlit está encontrando um erro de sintaxe em algum lugar do seu código.  O `SyntaxError`  no início do traceback (`line 1 ```python ^ SyntaxError: invalid syntax`) é um indicativo forte de que a própria mensagem de erro é truncada e não mostra o erro real.\n\nPara resolver', ' precisamos inspecionar o código `upload_planilha.py` cuidadosamente em busca de erros de sintaxe']}
 
 
 
@@ -555,7 +368,7 @@ def menu_lateral(pagina="Chat Construtor"):
         st.subheader("MENU EM CONSTRUÇÃO")
         for pag, value in src.constantes.PAGINAS.items():
             try:st.page_link(pag, label=value[0], icon=value[1])
-            except Exception as e: st.warning(e)
+            except Exception: st.warning('Recarregue a página apertando R para visualizar as alterações. Ou clique em Rerun')
 
 
 
